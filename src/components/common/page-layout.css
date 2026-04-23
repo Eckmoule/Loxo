@@ -1,0 +1,79 @@
+/* Common page layout for auth & contact pages */
+.page-layout {
+    min-height: calc(100vh - 56px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.page-layout__background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background-image:
+        linear-gradient(var(--border-subtle) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.5;
+}
+
+.page-layout__gradient {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: radial-gradient(ellipse 70% 70% at 50% 50%, transparent 0%, var(--bg) 80%);
+}
+
+.page-layout__content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 400px;
+}
+
+.page-header {
+    margin-bottom: 32px;
+}
+
+.page-header--center {
+    text-align: center;
+}
+
+.page-header__title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 26px;
+    letter-spacing: -0.04em;
+    color: var(--text-1);
+    margin-bottom: 8px;
+}
+
+.page-header__subtitle {
+    font-size: 14px;
+    color: var(--text-3);
+    line-height: 1.6;
+}
+
+.page-card {
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 28px;
+    box-shadow: var(--shadow-md);
+}
+
+.page-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.page-footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-3);
+}

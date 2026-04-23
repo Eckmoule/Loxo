@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase } from './lib/supabase'; 
+import { supabase } from './lib/supabase';
 import Nav from './components/Nav';
 import Home from './components/Home';
-import Contact from './components/Contact';
+import Contact from './components/pages/Contact';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import ForgotPassword from './components/auth/ForgotPassword';
@@ -12,7 +12,7 @@ import './App.css';
 function App() {
   const [screen, setScreen] = useState('home');
   const [theme, setTheme] = useState('dark');
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -50,29 +50,29 @@ function App() {
     window.scrollTo({ top: 0 });
   };
 
-  const handleSignOut = async () => { 
+  const handleSignOut = async () => {
     await supabase.auth.signOut();
     setScreen('home');
   };
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-1)' }}>
-    <Nav
-      theme={theme}
-      onToggleTheme={handleToggleTheme}
-      screen={screen}
-      city={null}
-      onNavigate={handleNavigate}
-      user={user}  
-      onSignOut={handleSignOut}  
-    />
-    {screen === 'home' && <Home onNavigate={handleNavigate} />}
-    {screen === 'contact' && <Contact onNavigate={handleNavigate} user={user} />}
-    {screen === 'signin' && <SignIn onNavigate={handleNavigate} />}
-    {screen === 'signup' && <SignUp onNavigate={handleNavigate} />}
-    {screen === 'forgot-password' && <ForgotPassword onNavigate={handleNavigate} />}
-    {screen === 'reset-password' && <ResetPassword onNavigate={handleNavigate} />}
-  </div>
+      <Nav
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
+        screen={screen}
+        city={null}
+        onNavigate={handleNavigate}
+        user={user}
+        onSignOut={handleSignOut}
+      />
+      {screen === 'home' && <Home onNavigate={handleNavigate} />}
+      {screen === 'contact' && <Contact onNavigate={handleNavigate} user={user} />}
+      {screen === 'signin' && <SignIn onNavigate={handleNavigate} />}
+      {screen === 'signup' && <SignUp onNavigate={handleNavigate} />}
+      {screen === 'forgot-password' && <ForgotPassword onNavigate={handleNavigate} />}
+      {screen === 'reset-password' && <ResetPassword onNavigate={handleNavigate} />}
+    </div>
   );
 }
 

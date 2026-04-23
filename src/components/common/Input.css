@@ -1,0 +1,63 @@
+/* Base input style */
+.input {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--surface-2);
+    border: 1.5px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--text-1);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    box-sizing: border-box;
+  }
+  
+  .input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-subtle);
+    background: var(--surface);
+  }
+  
+  .input:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  .input--error {
+    border-color: var(--negative);
+  }
+  
+  .input--error:focus {
+    box-shadow: 0 0 0 3px var(--negative-subtle);
+  }
+  
+  /* Textarea variant */
+  .input--textarea {
+    resize: vertical;
+    min-height: 120px;
+    font-family: var(--font-sans);
+    line-height: 1.6;
+  }
+  
+  /* Password input with icon */
+  .input-wrapper {
+    position: relative;
+  }
+  
+  .input-wrapper .input {
+    padding-right: 44px;
+  }
+  
+  .input-wrapper__icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-3);
+    padding: 4px;
+    line-height: 0;
+  }

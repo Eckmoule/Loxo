@@ -1,0 +1,131 @@
+@import '../common/page-layout.css';
+
+/* Contact-specific styles */
+.page-layout__content--contact {
+    max-width: 520px;
+}
+
+.page-header__title--contact {
+    font-size: 30px;
+}
+
+.page-form--contact {
+    gap: 18px;
+}
+
+.contact-info {
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: var(--shadow-sm);
+}
+
+.contact-info__icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    background: var(--accent-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.contact-info__email {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-1);
+}
+
+.contact-info__response {
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 1px;
+}
+
+.message-counter {
+    margin-top: 4px;
+    text-align: right;
+    font-size: 11px;
+    font-family: var(--font-mono);
+}
+
+.message-counter--short {
+    color: var(--text-3);
+}
+
+.message-counter--ok {
+    color: var(--positive);
+}
+
+.subject-dropdown {
+    position: relative;
+}
+
+.subject-dropdown__button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    text-align: left;
+}
+
+.subject-dropdown__button--placeholder {
+    color: var(--text-3);
+}
+
+.subject-dropdown__arrow {
+    flex-shrink: 0;
+    transition: transform 0.2s;
+    color: var(--text-3);
+}
+
+.subject-dropdown__arrow--open {
+    transform: rotate(180deg);
+}
+
+.subject-dropdown__menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    z-index: 50;
+}
+
+.subject-dropdown__item {
+    display: block;
+    width: 100%;
+    padding: 9px 14px;
+    text-align: left;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text-1);
+    transition: background 0.1s;
+}
+
+.subject-dropdown__item--selected {
+    background: var(--accent-subtle);
+    color: var(--accent-text);
+}
+
+.subject-dropdown__item:hover {
+    background: var(--surface-2);
+}
+
+.subject-dropdown__item--selected:hover {
+    background: var(--accent-subtle);
+}
