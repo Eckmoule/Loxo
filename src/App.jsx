@@ -67,7 +67,7 @@ function App() {
       onSignOut={handleSignOut}  
     />
     {screen === 'home' && <Home onNavigate={handleNavigate} />}
-    {screen === 'contact' && <Contact onNavigate={handleNavigate} />}
+    {screen === 'contact' && <Contact onNavigate={handleNavigate} user={user} />}
     {screen === 'signin' && <SignIn onNavigate={handleNavigate} />}
     {screen === 'signup' && <SignUp onNavigate={handleNavigate} />}
     {screen === 'forgot-password' && <ForgotPassword onNavigate={handleNavigate} />}

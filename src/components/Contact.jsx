@@ -1,5 +1,7 @@
 // Contact.jsx — Page de contact Loxo
 import { useState } from 'react';
+import { supabase } from '../lib/supabase';
+import { validateEmail, validateMessageLength } from '../utils/validation';
 
 const SUBJECTS = [
   'Question générale',
@@ -10,8 +12,8 @@ const SUBJECTS = [
   'Autre',
 ];
 
-function Contact({ onNavigate }) {
-  const [form, setForm] = useState({ email: '', subject: '', message: '' });
+function Contact({ onNavigate, user }) {
+  const [form, setForm] = useState({ email: user?.email || '', subject: '', message: '' });
   const [sent, setSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -21,19 +23,45 @@ function Contact({ onNavigate }) {
 
   const validate = () => {
     const e = {};
-    if (!form.email.includes('@')) e.email = 'Adresse e-mail invalide';
+    
+    const emailError = validateEmail(form.email);
+    if (emailError) e.email = emailError;
+    
     if (!form.subject) e.subject = 'Veuillez choisir un sujet';
-    if (form.message.trim().length < 10) e.message = 'Message trop court (10 caractères min.)';
+    
+    const messageError = validateMessageLength(form.message, 10);
+    if (messageError) e.message = messageError;
+    
     return e;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {  
     e.preventDefault();
     const e2 = validate();
     setErrors(e2);
     if (Object.keys(e2).length) return;
+    
     setLoading(true);
-    setTimeout(() => { setLoading(false); setSent(true); }, 1400);
+    
+    const { error } = await supabase
+      .from('contact_messages')
+      .insert([
+        {
+          email: form.email,
+          subject: form.subject,
+          message: form.message,
+          user_id: user?.id || null,
+        }
+      ]);
+    
+    setLoading(false);
+    
+    if (error) {
+      setErrors({ message: 'Erreur lors de l\'envoi. Veuillez réessayer.' });
+      console.error('Erreur Supabase:', error);
+    } else {
+      setSent(true);
+    }
   };
 
   if (sent) {
@@ -126,6 +154,7 @@ function Contact({ onNavigate }) {
                 value={form.email}
                 onChange={e => set('email', e.target.value)}
                 placeholder="vous@exemple.fr"
+                disabled={!!user} 
                 style={fieldInput(!!errors.email)}
                 onFocus={e => Object.assign(e.target.style, inputFocusStyle)}
                 onBlur={e => Object.assign(e.target.style, errors.email ? inputErrorStyle : inputBlurStyle)}
@@ -235,32 +264,6 @@ function Contact({ onNavigate }) {
               )}
             </button>
           </form>
-        </div>
-
-        {/* Info band */}
-        <div style={{
-          marginTop: 20, padding: '14px 18px',
-          background: 'var(--surface)',
-          border: '1px solid var(--border-subtle)',
-          borderRadius: 'var(--radius-md)',
-          display: 'flex', alignItems: 'center', gap: 12,
-          boxShadow: 'var(--shadow-sm)',
-        }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 'var(--radius-sm)',
-            background: 'var(--accent-subtle)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <rect x="1" y="3" width="14" height="10" rx="1.5" stroke="var(--accent)" strokeWidth="1.3"/>
-              <path d="M1 5l7 5 7-5" stroke="var(--accent)" strokeWidth="1.3" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <div>
-            <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-1)' }}>contact@loxo.fr</div>
-            <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 1 }}>Réponse sous 24 à 48h ouvrées</div>
-          </div>
         </div>
       </div>
 

@@ -35,3 +35,10 @@ export const validateEmail = (email) => {
     
     return errors;
   };
+
+  export const validateMessageLength = (message, minLength = 10) => {
+    if (!message || message.trim().length < minLength) {
+      return `Message trop court (${minLength} caractères min.)`;
+    }
+    return null;
+  };
