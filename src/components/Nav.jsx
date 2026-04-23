@@ -1,8 +1,18 @@
 // Nav.jsx — Loxo navigation bar
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 function Nav({ theme, onToggleTheme, screen, city, onNavigate }) {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setMenuOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   const logoMark = (
     <svg width="22" height="22" viewBox="0 0 40 40" fill="none">
@@ -14,7 +24,7 @@ function Nav({ theme, onToggleTheme, screen, city, onNavigate }) {
   );
 
   const breadcrumb = () => {
-    if (screen === 'home') return null;
+    if (screen === 'home' || screen === 'signin' || screen === 'contact') return null;
     return (
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--text-3)' }}>
         <button onClick={() => onNavigate('home')} style={navLinkStyle}>Accueil</button>
@@ -34,6 +44,39 @@ function Nav({ theme, onToggleTheme, screen, city, onNavigate }) {
       </div>
     );
   };
+
+  const menuItems = [
+    {
+      label: 'Nous contacter',
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <rect x="1" y="3" width="12" height="8.5" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
+          <path d="M1 4.5l6 4 6-4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+        </svg>
+      ),
+      action: () => { onNavigate('contact'); setMenuOpen(false); }
+    },
+    {
+      label: 'À propos',
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3"/>
+          <path d="M7 6.5v3.5M7 4.5v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+        </svg>
+      ),
+      action: () => setMenuOpen(false)
+    },
+    {
+      label: 'Documentation DVF',
+      icon: (
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <rect x="2" y="1" width="10" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
+          <path d="M4.5 5h5M4.5 7.5h5M4.5 10h3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+        </svg>
+      ),
+      action: () => setMenuOpen(false)
+    },
+  ];
 
   return (
     <header style={{
@@ -70,37 +113,74 @@ function Nav({ theme, onToggleTheme, screen, city, onNavigate }) {
 
         {/* Actions */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {screen !== 'home' && (
-            <a
-              href="https://www.data.gouv.fr/fr/datasets/demandes-de-valeurs-foncieres/"
-              target="_blank"
-              rel="noopener noreferrer"
+
+          {/* Menu hamburger */}
+          <div style={{ position: 'relative' }} ref={menuRef}>
+            <button
+              onClick={() => setMenuOpen(o => !o)}
               style={{
-                fontSize: 12, color: 'var(--text-3)',
-                textDecoration: 'none', padding: '4px 10px',
-                borderRadius: 'var(--radius-sm)',
+                width: 36, height: 36,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                background: menuOpen ? 'var(--surface-2)' : 'none',
                 border: '1px solid var(--border-subtle)',
-                fontFamily: 'var(--font-mono)',
-                transition: 'color 0.15s, border-color 0.15s',
+                borderRadius: 'var(--radius-sm)', cursor: 'pointer',
+                color: menuOpen ? 'var(--text-1)' : 'var(--text-2)',
+                transition: 'background 0.15s, color 0.15s',
               }}
-              onMouseEnter={e => { e.target.style.color = 'var(--text-2)'; e.target.style.borderColor = 'var(--border)'; }}
-              onMouseLeave={e => { e.target.style.color = 'var(--text-3)'; e.target.style.borderColor = 'var(--border-subtle)'; }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text-1)'; }}
+              onMouseLeave={e => { if (!menuOpen) { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--text-2)'; } }}
+              title="Menu"
             >
-              DVF
-            </a>
-          )}
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <path d="M2 4h11M2 7.5h11M2 11h11" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+              </svg>
+            </button>
+
+            {/* Dropdown */}
+            {menuOpen && (
+              <div style={{
+                position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                minWidth: 200,
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-md)',
+                boxShadow: 'var(--shadow-lg)',
+                overflow: 'hidden',
+                zIndex: 200,
+              }}>
+                {menuItems.map((item, i) => (
+                  <button key={i} onClick={item.action} style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    width: '100%', padding: '10px 14px',
+                    background: 'none', border: 'none',
+                    borderBottom: i < menuItems.length - 1 ? '1px solid var(--border-subtle)' : 'none',
+                    cursor: 'pointer',
+                    fontFamily: 'var(--font-sans)', fontSize: 13,
+                    color: 'var(--text-1)', textAlign: 'left',
+                    transition: 'background 0.1s',
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-2)'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                  >
+                    <span style={{ color: 'var(--text-3)', flexShrink: 0 }}>{item.icon}</span>
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           {/* Theme toggle */}
           <button
             onClick={onToggleTheme}
-            title={theme === 'light' ? 'Passer en mode sombre' : 'Passer en mode clair'}
+            title={theme === 'light' ? 'Mode sombre' : 'Mode clair'}
             style={{
               width: 36, height: 36,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               background: 'none', border: '1px solid var(--border-subtle)',
               borderRadius: 'var(--radius-sm)', cursor: 'pointer',
               color: 'var(--text-2)',
-              transition: 'background 0.15s, border-color 0.15s, color 0.15s',
+              transition: 'background 0.15s, color 0.15s',
             }}
             onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.color = 'var(--text-1)'; }}
             onMouseLeave={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = 'var(--text-2)'; }}
@@ -115,6 +195,30 @@ function Nav({ theme, onToggleTheme, screen, city, onNavigate }) {
                 <path d="M13.5 9.5A5.5 5.5 0 016.5 2.5 5.5 5.5 0 1013.5 9.5z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             )}
+          </button>
+
+          {/* Sign in */}
+          <button
+            onClick={() => onNavigate('signin')}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 7,
+              padding: '0 14px', height: 36,
+              background: screen === 'signin' ? 'var(--accent)' : 'var(--accent)',
+              color: '#fff',
+              border: 'none', borderRadius: 'var(--radius-sm)',
+              cursor: 'pointer',
+              fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500,
+              transition: 'background 0.15s',
+              flexShrink: 0,
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-hover)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="5" r="2.5" stroke="white" strokeWidth="1.3"/>
+              <path d="M1.5 12.5c0-2.5 2.5-4 5.5-4s5.5 1.5 5.5 4" stroke="white" strokeWidth="1.3" strokeLinecap="round"/>
+            </svg>
+            Se connecter
           </button>
         </div>
       </div>

@@ -3,14 +3,6 @@ import { useState, useRef } from 'react';
 
 const SUGGESTIONS = ['Paris', 'Lyon', 'Bordeaux', 'Toulouse', 'Nantes', 'Marseille', 'Montpellier', 'Lille'];
 
-const CITY_CARDS = [
-  { id: 'paris',    name: 'Paris',    code: '75', price: 9750,  tendance: -1.2, volume: 3842 },
-  { id: 'lyon',     name: 'Lyon',     code: '69', price: 4450,  tendance: +0.8, volume: 1654 },
-  { id: 'bordeaux', name: 'Bordeaux', code: '33', price: 4180,  tendance: -2.1, volume: 982  },
-  { id: 'toulouse', name: 'Toulouse', code: '31', price: 3620,  tendance: +1.4, volume: 1128 },
-  { id: 'nantes',   name: 'Nantes',   code: '44', price: 3940,  tendance: -0.5, volume: 876  },
-];
-
 function Home({ onNavigate }) {
   const [query, setQuery] = useState('');
   const [focused, setFocused] = useState(false);
@@ -44,7 +36,7 @@ function Home({ onNavigate }) {
         minHeight: 'calc(100vh - 56px)',
         display: 'flex', flexDirection: 'column',
         alignItems: 'center', justifyContent: 'center',
-        padding: '80px 24px',
+        padding: '80px 0px',
         position: 'relative', overflow: 'hidden',
       }}>
 
@@ -207,104 +199,11 @@ function Home({ onNavigate }) {
           </div>
         </div>
       </section>
-
-      {/* City cards */}
-      <section style={{
-        maxWidth: 1200, margin: '0 auto',
-        padding: '0 24px 96px',
-      }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          marginBottom: 24,
-        }}>
-          <h2 style={{
-            fontFamily: 'var(--font-display)', fontWeight: 600,
-            fontSize: 15, color: 'var(--text-2)',
-            letterSpacing: '-0.01em',
-          }}>
-            Marchés récents
-          </h2>
-          <span style={{ fontSize: 12, color: 'var(--text-3)', fontFamily: 'var(--font-mono)' }}>
-            Médiane prix/m² — 12 derniers mois
-          </span>
-        </div>
-
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gap: 12,
-        }}>
-          {CITY_CARDS.map(c => (
-            <CityCard key={c.id} city={c} onClick={() => {
-              const cityData = window.LOXO_DATA.cities[c.id];
-              if (cityData) onNavigate('macro', { city: cityData });
-            }} />
-          ))}
-        </div>
-      </section>
     </main>
   );
 }
 
 // Helper
 const var_radius_lg = 'var(--radius-lg)';
-
-function CityCard({ city, onClick }) {
-    
-    const [hovered, setHovered] = useState(false);
-    const isPos = city.tendance >= 0;
-
-  return (
-    <button
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: hovered ? 'var(--surface)' : 'var(--surface)',
-        border: `1px solid ${hovered ? 'var(--border)' : 'var(--border-subtle)'}`,
-        borderRadius: 'var(--radius-md)',
-        padding: '20px',
-        cursor: 'pointer', textAlign: 'left',
-        boxShadow: hovered ? 'var(--shadow-md)' : 'var(--shadow-sm)',
-        transition: 'border-color 0.2s, box-shadow 0.2s, transform 0.15s',
-        transform: hovered ? 'translateY(-2px)' : 'translateY(0)',
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-        <div>
-          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15, color: 'var(--text-1)', letterSpacing: '-0.02em' }}>
-            {city.name}
-          </div>
-          <div style={{ fontSize: 11, color: 'var(--text-3)', fontFamily: 'var(--font-mono)', marginTop: 2 }}>
-            {city.code}
-          </div>
-        </div>
-        <span style={{
-          fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 500,
-          color: isPos ? 'var(--positive)' : 'var(--negative)',
-          background: isPos ? 'var(--positive-subtle)' : 'var(--negative-subtle)',
-          padding: '3px 7px', borderRadius: 99,
-        }}>
-          {isPos ? '+' : ''}{city.tendance}%
-        </span>
-      </div>
-
-      <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 500, fontSize: 22, color: 'var(--text-1)', letterSpacing: '-0.03em' }}>
-        {city.price.toLocaleString('fr-FR')}
-      </div>
-      <div style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 2 }}>
-        € / m²
-      </div>
-
-      <div style={{
-        marginTop: 14, paddingTop: 14,
-        borderTop: '1px solid var(--border-subtle)',
-        fontSize: 11, color: 'var(--text-3)', fontFamily: 'var(--font-mono)',
-      }}>
-        {city.volume.toLocaleString('fr-FR')} transactions
-      </div>
-    </button>
-  );
-}
 
 export default Home;

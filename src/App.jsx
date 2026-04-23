@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import Nav from './components/Nav';
 import Home from './components/Home';
+import Contact from './components/Contact';
+import SignIn from './components/SignIn';
 import './App.css';
 
 function App() {
-  const [theme, setTheme] = useState('light');
+  const [screen, setScreen] = useState('home');
+  const [theme, setTheme] = useState('dark');
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -14,22 +17,24 @@ function App() {
     setTheme(t => t === 'light' ? 'dark' : 'light');
   };
 
-  const handleNavigate = (screen, data) => {
-    // Pour l'instant on ne fait rien, juste la home
-    console.log('Navigate to:', screen, data);
+  const handleNavigate = (to, data = {}) => {
+    setScreen(to);
+    window.scrollTo({ top: 0 });
   };
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-1)' }}>
-      <Nav
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
-        screen="home"
-        city={null}
-        onNavigate={handleNavigate}
-      />
-      <Home onNavigate={handleNavigate} />
-    </div>
+    <Nav
+      theme={theme}
+      onToggleTheme={handleToggleTheme}
+      screen={screen}
+      city={null}
+      onNavigate={handleNavigate}
+    />
+    {screen === 'home' && <Home onNavigate={handleNavigate} />}
+    {screen === 'contact' && <Contact onNavigate={handleNavigate} />}
+    {screen === 'signin' && <SignIn onNavigate={handleNavigate} />}
+  </div>
   );
 }
 
