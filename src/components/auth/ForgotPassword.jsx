@@ -1,23 +1,75 @@
-// SignIn.jsx — Page de connexion Loxo
 import { useState } from 'react';
+import { supabase } from '../../lib/supabase';
 
-function SignIn({ onNavigate }) {
+function ForgotPassword({ onNavigate }) {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    if (!email || !password) { setError('Veuillez remplir tous les champs.'); return; }
+    
+    if (!email) {
+      setError('Veuillez entrer votre adresse e-mail.');
+      return;
+    }
+    
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      onNavigate('home');
-    }, 1200);
+    
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    
+    setLoading(false);
+    
+    if (error) {
+      setError(error.message);
+    } else {
+      setSuccess(true);
+    }
   };
+
+  if (success) {
+    return (
+      <main style={{
+        minHeight: 'calc(100vh - 56px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: '40px 24px',
+      }}>
+        <div style={{ textAlign: 'center', maxWidth: 400 }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: '50%',
+            background: 'var(--positive-subtle)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 24px',
+          }}>
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="2" y="6" width="24" height="16" rx="2" stroke="var(--positive)" strokeWidth="2"/>
+              <path d="M2 9l12 8 12-8" stroke="var(--positive)" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <h2 style={{
+            fontFamily: 'var(--font-display)', fontWeight: 800,
+            fontSize: 24, letterSpacing: '-0.04em', color: 'var(--text-1)', marginBottom: 12,
+          }}>E-mail envoyé !</h2>
+          <p style={{ fontSize: 14, color: 'var(--text-3)', lineHeight: 1.7, marginBottom: 28 }}>
+            Vérifiez votre boîte mail. Nous vous avons envoyé un lien pour réinitialiser votre mot de passe.
+          </p>
+          <button onClick={() => onNavigate('signin')} style={{
+            padding: '10px 24px',
+            background: 'var(--accent)', color: '#fff',
+            border: 'none', borderRadius: 'var(--radius-sm)',
+            fontFamily: 'var(--font-sans)', fontSize: 14, fontWeight: 500,
+            cursor: 'pointer',
+          }}>
+            Retour à la connexion
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main style={{
@@ -67,9 +119,9 @@ function SignIn({ onNavigate }) {
             fontFamily: 'var(--font-display)', fontWeight: 800,
             fontSize: 26, letterSpacing: '-0.04em', color: 'var(--text-1)',
             marginBottom: 8,
-          }}>Bon retour</h1>
+          }}>Mot de passe oublié ?</h1>
           <p style={{ fontSize: 14, color: 'var(--text-3)', lineHeight: 1.6 }}>
-            Connectez-vous pour accéder à vos analyses
+            Entrez votre e-mail pour recevoir un lien de réinitialisation
           </p>
         </div>
 
@@ -92,55 +144,10 @@ function SignIn({ onNavigate }) {
                 onChange={e => setEmail(e.target.value)}
                 placeholder="vous@exemple.fr"
                 autoComplete="email"
-                style={inputStyle(false)}
+                style={inputStyle()}
                 onFocus={e => Object.assign(e.target.style, inputFocusStyle)}
                 onBlur={e => Object.assign(e.target.style, inputBlurStyle)}
               />
-            </div>
-
-            {/* Password */}
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 7 }}>
-                <label style={{ ...labelStyle, marginBottom: 0 }}>Mot de passe</label>
-                <button type="button" style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  fontSize: 12, color: 'var(--accent)', fontFamily: 'var(--font-sans)',
-                }}>Mot de passe oublié ?</button>
-              </div>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={showPass ? 'text' : 'password'}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  style={{ ...inputStyle(false), paddingRight: 44 }}
-                  onFocus={e => Object.assign(e.target.style, inputFocusStyle)}
-                  onBlur={e => Object.assign(e.target.style, inputBlurStyle)}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPass(s => !s)}
-                  style={{
-                    position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
-                    background: 'none', border: 'none', cursor: 'pointer',
-                    color: 'var(--text-3)', padding: 4, lineHeight: 0,
-                  }}
-                >
-                  {showPass ? (
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M2 8s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.3"/>
-                      <circle cx="8" cy="8" r="1.8" fill="currentColor"/>
-                      <path d="M3 3l10 10" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
-                    </svg>
-                  ) : (
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                      <path d="M2 8s2.5-4 6-4 6 4 6 4-2.5 4-6 4-6-4-6-4z" stroke="currentColor" strokeWidth="1.3"/>
-                      <circle cx="8" cy="8" r="1.8" fill="currentColor"/>
-                    </svg>
-                  )}
-                </button>
-              </div>
             </div>
 
             {/* Error */}
@@ -167,66 +174,27 @@ function SignIn({ onNavigate }) {
                 fontFamily: 'var(--font-sans)', fontSize: 14, fontWeight: 500,
                 cursor: loading ? 'wait' : 'pointer',
                 transition: 'background 0.2s, color 0.2s',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
               }}
               onMouseEnter={e => { if (!loading) e.currentTarget.style.background = 'var(--accent-hover)'; }}
               onMouseLeave={e => { if (!loading) e.currentTarget.style.background = 'var(--accent)'; }}
             >
-              {loading ? (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ animation: 'spin 0.8s linear infinite' }}>
-                    <circle cx="8" cy="8" r="6" stroke="var(--accent-text)" strokeWidth="1.5" strokeDasharray="28" strokeDashoffset="10"/>
-                  </svg>
-                  Connexion…
-                </>
-              ) : 'Se connecter'}
+              {loading ? 'Envoi...' : 'Envoyer le lien'}
             </button>
           </form>
-
-          {/* Divider */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, margin: '20px 0' }}>
-            <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }}/>
-            <span style={{ fontSize: 12, color: 'var(--text-3)', fontFamily: 'var(--font-mono)' }}>ou</span>
-            <div style={{ flex: 1, height: 1, background: 'var(--border-subtle)' }}/>
-          </div>
-
-          {/* SSO */}
-          <button style={{
-            width: '100%', padding: '10px 0',
-            background: 'var(--surface-2)', color: 'var(--text-1)',
-            border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-sm)',
-            fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500,
-            cursor: 'pointer',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-            transition: 'background 0.15s, border-color 0.15s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'var(--surface-3)'; e.currentTarget.style.borderColor = 'var(--border)'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = 'var(--surface-2)'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; }}
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M15 8.18A7 7 0 11 8.18 1 7 7 0 0115 8.18z" stroke="var(--text-3)" strokeWidth="1.2"/>
-              <path d="M8 1v14M1 8h14" stroke="var(--text-3)" strokeWidth="1.2"/>
-              <path d="M2 5.5Q5 7 8 7t6-1.5M2 10.5Q5 9 8 9t6 1.5" stroke="var(--text-3)" strokeWidth="1.2"/>
-            </svg>
-            Continuer avec SSO
-          </button>
         </div>
 
         {/* Footer */}
         <p style={{ textAlign: 'center', marginTop: 20, fontSize: 13, color: 'var(--text-3)' }}>
-          Pas encore de compte ?{' '}
-          <button style={{
+          Vous vous souvenez ?{' '}
+          <button onClick={() => onNavigate('signin')} style={{
             background: 'none', border: 'none', cursor: 'pointer',
             color: 'var(--accent)', fontFamily: 'var(--font-sans)', fontSize: 13,
             fontWeight: 500,
           }}>
-            Créer un compte
+            Se connecter
           </button>
         </p>
       </div>
-
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </main>
   );
 }
@@ -258,4 +226,4 @@ const inputBlurStyle = {
   background: 'var(--surface-2)',
 };
 
-export default SignIn;
+export default ForgotPassword;

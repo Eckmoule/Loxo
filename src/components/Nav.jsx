@@ -1,7 +1,7 @@
 // Nav.jsx — Loxo navigation bar
 import { useState, useRef, useEffect } from 'react';
 
-function Nav({ theme, onToggleTheme, screen, city, onNavigate }) {
+function Nav({ theme, onToggleTheme, screen, city, onNavigate, user, onSignOut }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -55,26 +55,6 @@ function Nav({ theme, onToggleTheme, screen, city, onNavigate }) {
         </svg>
       ),
       action: () => { onNavigate('contact'); setMenuOpen(false); }
-    },
-    {
-      label: 'À propos',
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <circle cx="7" cy="7" r="5.5" stroke="currentColor" strokeWidth="1.3"/>
-          <path d="M7 6.5v3.5M7 4.5v.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-        </svg>
-      ),
-      action: () => setMenuOpen(false)
-    },
-    {
-      label: 'Documentation DVF',
-      icon: (
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <rect x="2" y="1" width="10" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.3"/>
-          <path d="M4.5 5h5M4.5 7.5h5M4.5 10h3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-        </svg>
-      ),
-      action: () => setMenuOpen(false)
     },
   ];
 
@@ -197,29 +177,54 @@ function Nav({ theme, onToggleTheme, screen, city, onNavigate }) {
             )}
           </button>
 
-          {/* Sign in */}
-          <button
-            onClick={() => onNavigate('signin')}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 7,
-              padding: '0 14px', height: 36,
-              background: screen === 'signin' ? 'var(--accent)' : 'var(--accent)',
-              color: '#fff',
-              border: 'none', borderRadius: 'var(--radius-sm)',
-              cursor: 'pointer',
-              fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500,
-              transition: 'background 0.15s',
-              flexShrink: 0,
-            }}
-            onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-hover)'}
-            onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <circle cx="7" cy="5" r="2.5" stroke="white" strokeWidth="1.3"/>
-              <path d="M1.5 12.5c0-2.5 2.5-4 5.5-4s5.5 1.5 5.5 4" stroke="white" strokeWidth="1.3" strokeLinecap="round"/>
-            </svg>
-            Se connecter
-          </button>
+          {/* Sign in / User menu */}
+          {user ? (
+            <div style={{ position: 'relative' }}>
+              <button
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 7,
+                  padding: '0 14px', height: 36,
+                  background: 'var(--surface-2)',
+                  color: 'var(--text-1)',
+                  border: '1px solid var(--border-subtle)',
+                  borderRadius: 'var(--radius-sm)',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500,
+                  transition: 'background 0.15s',
+                }}
+                onClick={onSignOut}
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle cx="7" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.3"/>
+                  <path d="M1.5 12.5c0-2.5 2.5-4 5.5-4s5.5 1.5 5.5 4" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round"/>
+                </svg>
+                Déconnexion
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => onNavigate('signin')}
+              style={{
+                display: 'flex', alignItems: 'center', gap: 7,
+                padding: '0 14px', height: 36,
+                background: screen === 'signin' ? 'var(--accent)' : 'var(--accent)',
+                color: '#fff',
+                border: 'none', borderRadius: 'var(--radius-sm)',
+                cursor: 'pointer',
+                fontFamily: 'var(--font-sans)', fontSize: 13, fontWeight: 500,
+                transition: 'background 0.15s',
+                flexShrink: 0,
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = 'var(--accent-hover)'}
+              onMouseLeave={e => e.currentTarget.style.background = 'var(--accent)'}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <circle cx="7" cy="5" r="2.5" stroke="white" strokeWidth="1.3"/>
+                <path d="M1.5 12.5c0-2.5 2.5-4 5.5-4s5.5 1.5 5.5 4" stroke="white" strokeWidth="1.3" strokeLinecap="round"/>
+              </svg>
+              Se connecter
+            </button>
+          )}
         </div>
       </div>
     </header>
