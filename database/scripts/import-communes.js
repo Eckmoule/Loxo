@@ -4,7 +4,7 @@
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 
-dotenv.config();
+dotenv.config({ path: '.env.local' });
 
 // Configuration Supabase
 const supabaseUrl = process.env.SUPABASE_URL;

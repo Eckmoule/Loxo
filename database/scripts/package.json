@@ -4,10 +4,12 @@
     "description": "Scripts d'import de données pour Loxo",
     "type": "module",
     "scripts": {
-        "import-communes": "node import-communes.js"
+        "import-communes": "node import-communes.js",
+        "import-transactions": "node import-transactions.js"
     },
     "dependencies": {
         "@supabase/supabase-js": "^2.39.0",
-        "dotenv": "^16.3.1"
+        "dotenv": "^16.3.1",
+        "csv-parser": "^3.0.0"
     }
 }

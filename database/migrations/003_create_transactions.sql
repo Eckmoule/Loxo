@@ -23,3 +23,12 @@ CREATE INDEX idx_transactions_geo ON transactions(latitude, longitude)
 COMMENT ON TABLE transactions IS 'Transactions immobilières DVF depuis 2014';
 COMMENT ON COLUMN transactions.valeur_fonciere IS 'Valeur de la transaction en euros';
 COMMENT ON COLUMN transactions.type_local IS 'M = Maison, A = Appartement (filtré à l''import)';
+
+-- Ajout des 3 colonnes adresse à la table transactions
+ALTER TABLE transactions 
+  ADD COLUMN numero_voie TEXT,
+  ADD COLUMN nom_voie TEXT;
+
+-- Commentaires pour documentation
+COMMENT ON COLUMN transactions.numero_voie IS 'Numéro de voie (ex: 12, 12bis)';
+COMMENT ON COLUMN transactions.nom_voie IS 'Nom de la voie (ex: de la République)';
