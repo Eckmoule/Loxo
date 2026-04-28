@@ -1,0 +1,13 @@
+{
+    "name": "loxo-database-scripts",
+    "version": "1.0.0",
+    "description": "Scripts d'import de données pour Loxo",
+    "type": "module",
+    "scripts": {
+        "import-communes": "node import-communes.js"
+    },
+    "dependencies": {
+        "@supabase/supabase-js": "^2.39.0",
+        "dotenv": "^16.3.1"
+    }
+}
