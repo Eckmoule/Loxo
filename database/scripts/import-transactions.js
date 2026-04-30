@@ -2,7 +2,7 @@
 // Source: https://files.data.gouv.fr/geo-dvf/latest/csv/
 
 // Remplir les variables : 
-const DEPARTEMENTS = ['69', '38']; // Rhône + Isère
+const DEPARTEMENTS = ['01', '69', '38']; // Ain + Rhône + Isère
 const ANNEES = [2021, 2022, 2023, 2024, 2025];
 
 // Le système va exclure :
