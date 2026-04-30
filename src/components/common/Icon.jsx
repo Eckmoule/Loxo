@@ -65,6 +65,20 @@ function Icon({ name, size = 16, color = 'currentColor', className = '' }) {
       </svg>
     ),
 
+    // Search & Location icons
+    search: (
+      <svg width={size} height={size} viewBox="0 0 16 16" fill="none" className={className}>
+        <circle cx="7" cy="7" r="5" stroke={color} strokeWidth="1.5" />
+        <path d="M11 11l2.5 2.5" stroke={color} strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    ),
+    mapPin: (
+      <svg width={size} height={size} viewBox="0 0 12 12" fill="none" className={className}>
+        <circle cx="6" cy="5" r="2.5" stroke={color} strokeWidth="1.3" />
+        <path d="M6 10c0 0-4-3.5-4-5a4 4 0 018 0c0 1.5-4 5-4 5z" stroke={color} strokeWidth="1.3" strokeLinejoin="round" />
+      </svg>
+    ),
+
     // Contact & Menu item icons
     mail: (
       <svg width={size} height={size} viewBox="0 0 14 14" fill="none" className={className}>
