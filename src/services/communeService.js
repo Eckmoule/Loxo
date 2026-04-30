@@ -22,7 +22,7 @@ export async function searchCommunes(query) {
                 .from('communes')
                 .select('code_commune, nom_commune, code_postal')
                 .eq('code_departement', dept)
-                .order('population', { ascending: false }) // Trier par population décroissante
+                .order('population', { ascending: false, nullsFirst: false }) // Trier par population décroissante
                 .limit(500);
 
             if (error) throw error;
@@ -40,7 +40,7 @@ export async function searchCommunes(query) {
                 .from('communes')
                 .select('code_commune, nom_commune, code_postal')
                 .ilike('nom_commune', `%${query}%`)
-                .order('population', { ascending: false }) // Trier par population décroissante
+                .order('population', { ascending: false, nullsFirst: false }) // Trier par population décroissante
                 .limit(5);
 
             if (error) throw error;
