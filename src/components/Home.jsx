@@ -1,33 +1,12 @@
-import { useState, useRef } from 'react';
-import Icon from './common/Icon';
+import SearchBar from './common/SearchBar';
 import './Home.css';
 
-const SUGGESTIONS = ['Paris', 'Lyon', 'Bordeaux', 'Toulouse', 'Nantes', 'Marseille', 'Montpellier', 'Lille'];
+const TAGS = ['Données officielles', 'Gratuit', 'Sans estimation', 'Source traçable'];
 
 function Home({ onNavigate }) {
-  const [query, setQuery] = useState('');
-  const [focused, setFocused] = useState(false);
-  const inputRef = useRef(null);
-
-  const filtered = query.length > 0
-    ? SUGGESTIONS.filter(s => s.toLowerCase().startsWith(query.toLowerCase()))
-    : SUGGESTIONS;
-
-  const handleSelect = (name) => {
-    const city = window.LOXO_DATA.cities[name.toLowerCase()];
-    if (city) {
-      onNavigate('macro', { city });
-    } else {
-      // fallback to paris for unlisted cities
-      onNavigate('macro', { city: { ...window.LOXO_DATA.cities.paris, name, id: name.toLowerCase() } });
-    }
-    setQuery('');
-    setFocused(false);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (query) handleSelect(query);
+  const handleSearch = (selectedCommune) => {
+    // Navigation vers la page commune avec les données
+    onNavigate('commune', { commune: selectedCommune });
   };
 
   return (
@@ -59,48 +38,11 @@ function Home({ onNavigate }) {
           </p>
 
           {/* Search */}
-          <form onSubmit={handleSubmit} className="search-form">
-            <div className={`search-input-wrapper ${focused ? 'search-input-wrapper--focused' : ''}`}>
-              <div className="search-input-wrapper__icon">
-                <Icon name="search" size={16} />
-              </div>
-
-              <input
-                ref={inputRef}
-                type="text"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setTimeout(() => setFocused(false), 150)}
-                placeholder="Paris, Lyon, 69000, Bordeaux..."
-                className="search-input"
-              />
-
-              <button type="submit" className="search-submit">
-                Rechercher
-              </button>
-            </div>
-
-            {/* Dropdown */}
-            {focused && filtered.length > 0 && (
-              <div className="search-dropdown">
-                {filtered.slice(0, 6).map(s => (
-                  <button
-                    key={s}
-                    onMouseDown={() => handleSelect(s)}
-                    className="search-dropdown__item"
-                  >
-                    <Icon name="mapPin" size={12} className="search-dropdown__item-icon" />
-                    {s}
-                  </button>
-                ))}
-              </div>
-            )}
-          </form>
+          <SearchBar onSelect={handleSearch} />
 
           {/* Tags */}
           <div className="hero__tags">
-            {['Données officielles', 'Gratuit', 'Sans estimation', 'Source traçable'].map(tag => (
+            {TAGS.map(tag => (
               <span key={tag} className="hero__tag">{tag}</span>
             ))}
           </div>

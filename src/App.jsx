@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import Nav from './components/Nav';
 import Home from './components/Home';
+import Commune from './components/pages/Commune';
 import Contact from './components/pages/Contact';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
@@ -11,6 +12,7 @@ import './App.css';
 
 function App() {
   const [screen, setScreen] = useState('home');
+  const [screenData, setScreenData] = useState({});
   const [theme, setTheme] = useState('dark');
   const [user, setUser] = useState(null);
 
@@ -19,7 +21,6 @@ function App() {
   }, [theme]);
 
   useEffect(() => {
-
     // Détecter si on arrive sur un lien de reset password
     if (window.location.hash.includes('type=recovery')) {
       setScreen('reset-password');
@@ -40,19 +41,20 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
 
-
   const handleToggleTheme = () => {
     setTheme(t => t === 'light' ? 'dark' : 'light');
   };
 
   const handleNavigate = (to, data = {}) => {
     setScreen(to);
+    setScreenData(data);
     window.scrollTo({ top: 0 });
   };
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     setScreen('home');
+    setScreenData({});
   };
 
   return (
@@ -61,12 +63,13 @@ function App() {
         theme={theme}
         onToggleTheme={handleToggleTheme}
         screen={screen}
-        city={null}
+        city={screenData.commune}
         onNavigate={handleNavigate}
         user={user}
         onSignOut={handleSignOut}
       />
       {screen === 'home' && <Home onNavigate={handleNavigate} />}
+      {screen === 'commune' && <Commune commune={screenData.commune} onNavigate={handleNavigate} />}
       {screen === 'contact' && <Contact onNavigate={handleNavigate} user={user} />}
       {screen === 'signin' && <SignIn onNavigate={handleNavigate} />}
       {screen === 'signup' && <SignUp onNavigate={handleNavigate} />}
