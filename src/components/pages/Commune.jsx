@@ -1,6 +1,19 @@
+import { useEffect } from 'react';
 import './Commune.css';
 
 function Commune({ commune, onNavigate }) {
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' || e.key === 'Backspace') {
+                onNavigate('home');
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [onNavigate]);
+
     if (!commune) {
         return (
             <main className="commune-page">

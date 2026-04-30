@@ -142,3 +142,9 @@
 .search-result-item:hover {
     background: var(--surface-2);
 }
+
+.search-result-item--selected {
+    background: var(--surface-2);
+    border-left: 3px solid var(--accent);
+    padding-left: 13px;
+}

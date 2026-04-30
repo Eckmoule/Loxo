@@ -9,6 +9,7 @@ function SearchBar({ onSelect }) {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(-1);
     const inputRef = useRef(null);
 
     const debouncedQuery = useDebounce(query, 300);
@@ -32,6 +33,11 @@ function SearchBar({ onSelect }) {
         fetchResults();
     }, [debouncedQuery]);
 
+
+    useEffect(() => {
+        setSelectedIndex(-1);
+    }, [results]);
+
     const handleSelect = (commune) => {
         if (onSelect) {
             onSelect(commune);
@@ -53,6 +59,33 @@ function SearchBar({ onSelect }) {
         return `${commune.nom_commune} (${commune.code_postal[0]})`;
     };
 
+    const handleKeyDown = (e) => {
+        if (!showDropdown || results.length === 0) return;
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                setSelectedIndex((prev) =>
+                    prev < results.length - 1 ? prev + 1 : prev
+                );
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                setSelectedIndex((prev) => prev > 0 ? prev - 1 : -1);
+                break;
+            case 'Enter':
+                e.preventDefault();
+                if (selectedIndex >= 0) {
+                    handleSelect(results[selectedIndex]);
+                }
+                break;
+            case 'Escape':
+                setShowDropdown(false);
+                setSelectedIndex(-1);
+                break;
+        }
+    };
+
     return (
         <form onSubmit={handleSubmit} className="search-form">
             <div className={`search-input-wrapper ${showDropdown ? 'search-input-wrapper--focused' : ''}`}>
@@ -67,6 +100,7 @@ function SearchBar({ onSelect }) {
                     onChange={e => setQuery(e.target.value)}
                     onFocus={() => query.length >= 2 && setShowDropdown(true)}
                     onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+                    onKeyDown={handleKeyDown}
                     placeholder="Paris,Lyon,69100,Bordeaux..."
                     className="search-input"
                     autoFocus
@@ -111,7 +145,7 @@ function SearchBar({ onSelect }) {
                             {results.map((commune) => (
                                 <li
                                     key={commune.code_commune}
-                                    className="search-result-item"
+                                    className={`search-result-item ${selectedIndex === results.indexOf(commune) ? 'search-result-item--selected' : ''}`}
                                     onMouseDown={(e) => {
                                         e.preventDefault();
                                         handleSelect(commune);
