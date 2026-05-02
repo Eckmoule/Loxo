@@ -115,6 +115,18 @@ function Icon({ name, size = 16, color = 'currentColor', className = '' }) {
         <path d="M3 5l4 4 4-4" stroke={color} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
+    // Transaction & Alert icons
+    document: (
+      <svg width={size} height={size} viewBox="0 0 14 14" fill="none" className={className}>
+        <rect x="2" y="1" width="10" height="12" rx="1.5" stroke={color} strokeWidth="1.3" />
+        <path d="M4.5 4.5h5M4.5 7h5M4.5 9.5h3" stroke={color} strokeWidth="1.2" strokeLinecap="round" />
+      </svg>
+    ),
+    bell: (
+      <svg width={size} height={size} viewBox="0 0 13 13" fill="none" className={className}>
+        <path d="M6.5 1.5a4 4 0 014 4c0 1.8.4 2.8.9 3.2H1.6c.5-.4.9-1.4.9-3.2a4 4 0 014-4z" stroke={color} strokeWidth="1.3" />
+        <path d="M5 8.7a1.5 1.5 0 003 0" stroke={color} strokeWidth="1.3" />
+      </svg>),
   };
 
   return icons[name] || null;

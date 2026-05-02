@@ -1,47 +1,185 @@
-
-import { useState, useEffect } from 'react';
-import { getAggregatsCommune, formatAggregatsForChart } from '../../services/aggregatsService';
+import { useState, useEffect, useRef } from 'react';
+import { getAggregatsCommune, formatCommuneData } from '../../services/aggregatsService';
+import Icon from '../common/Icon';
 import './Commune.css';
 
-// Données de test en dur (temporaire)
-const MOCK_CITY = {
-    name: "Lyon",
-    code: "69123",
-    region: "Auvergne-Rhône-Alpes",
-    stats: {
-        mediane: 5420,
-        volume: 2847,
-        tendance: 3.2
+// ── Configuration fiabilité ──
+const FIABILITE_CONFIG = {
+    excellent: {
+        color: 'var(--positive)',
+        bg: 'var(--positive-subtle)',
+        label: 'Excellent',
+        dot: 'var(--positive)'
     },
-    labels: ['T1 2021', 'T2 2021', 'T3 2021', 'T4 2021', 'T1 2022', 'T2 2022', 'T3 2022', 'T4 2022', 'T1 2023', 'T2 2023', 'T3 2023', 'T4 2023', 'T1 2024', 'T2 2024', 'T3 2024', 'T4 2024'],
-    priceHistory: {
-        appartement: {
-            all: [4850, 4920, 5010, 5080, 5150, 5200, 5280, 5310, 5340, 5370, 5390, 5410, 5430, 5450, 5470, 5490],
-            '2p': [4650, 4710, 4790, 4850, 4920, 4970, 5040, 5070, 5100, 5130, 5150, 5170, 5190, 5210, 5230, 5250],
-            '3p': [5050, 5130, 5230, 5310, 5380, 5430, 5520, 5550, 5580, 5610, 5630, 5650, 5670, 5690, 5710, 5730]
-        },
-        maison: {
-            all: [3850, 3920, 4010, 4080, 4150, 4200, 4280, 4310, 4340, 4370, 4390, 4410, 4430, 4450, 4470, 4490]
-        }
-    }
+    bon: {
+        color: 'oklch(62% 0.18 55)',
+        bg: 'oklch(94% 0.04 55)',
+        label: 'Bon',
+        dot: 'oklch(62% 0.18 55)'
+    },
+    limite: {
+        color: 'var(--negative)',
+        bg: 'var(--negative-subtle)',
+        label: 'Limité',
+        dot: 'var(--negative)'
+    },
 };
 
-// ── Composant LineChart ──
-function LineChart({ data, labels, color = 'var(--accent)', height = 280 }) {
+// ── Composant Header ──
+function CommuneHeader({ commune, fiabilite, onNavigate }) {
+    const [alertSent, setAlertSent] = useState(false);
+    const f = FIABILITE_CONFIG[fiabilite.niveau];
+
+    return (
+        <div className="commune-header">
+            <div className="commune-header__content">
+
+                {/* Left — title + meta */}
+                <div>
+                    <div className="commune-header__title-group">
+                        <h1 className="commune-header__title">
+                            {commune.nom_commune}
+                        </h1>
+                        <span className="commune-header__code">
+                            {commune.code_postal?.[0] || commune.code_commune}
+                        </span>
+                    </div>
+
+                    {/* Fiabilité inline */}
+                    <div className="commune-header__meta">
+                        <div
+                            className="commune-header__fiabilite"
+                            style={{
+                                background: f.bg,
+                                border: `1px solid ${f.color}40`,
+                            }}
+                        >
+                            <span
+                                className="commune-header__fiabilite-dot"
+                                style={{
+                                    background: f.dot,
+                                    boxShadow: `0 0 0 2px ${f.dot}30`,
+                                }}
+                            />
+                            <span
+                                className="commune-header__fiabilite-label"
+                                style={{ color: f.color }}
+                            >
+                                {f.label}
+                            </span>
+                        </div>
+                        <span className="commune-header__meta-text">
+                            {fiabilite.total_transactions} transactions · min. {fiabilite.min_trimestre}/trim.
+                        </span>
+                        <span className="commune-header__meta-text">
+                            INSEE {commune.code_commune}
+                        </span>
+                    </div>
+                </div>
+
+                {/* Right — CTAs */}
+                <div className="commune-header__actions">
+                    {/* Voir transactions */}
+                    <button
+                        onClick={() => console.log('Navigation vers micro (à implémenter)')}
+                        className="commune-header__btn commune-header__btn--secondary"
+                    >
+                        <Icon name="document" size={14} color="var(--text-2)" />
+                        Voir les transactions
+                    </button>
+
+                    {/* Alerte */}
+                    <button
+                        onClick={() => setAlertSent(a => !a)}
+                        className={`commune-header__btn ${alertSent ? 'commune-header__btn--active' : 'commune-header__btn--primary'}`}
+                    >
+                        {alertSent ? (
+                            <>
+                                <Icon name="check" size={13} />
+                                Alerte activée
+                            </>
+                        ) : (
+                            <>
+                                <Icon name="bell" size={13} color="white" />
+                                Être alerté des nouveaux prix
+                            </>
+                        )}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ── Composant FiltresTabs ──
+function FiltresTabs({ filtresDisponibles, active, onChange }) {
+    const filtres = [
+        { key: 'tous', label: 'Tous', disponible: filtresDisponibles.tous },
+        { key: 'appartements', label: 'Appartements', disponible: filtresDisponibles.appartements },
+        { key: 'maisons', label: 'Maisons', disponible: filtresDisponibles.maisons }
+    ];
+
+    return (
+        <div className="filtres-tabs">
+            {filtres.map(f => (
+                <button
+                    key={f.key}
+                    onClick={() => onChange(f.key)}
+                    disabled={!f.disponible}
+                    className={`filtres-tabs__btn ${active === f.key ? 'filtres-tabs__btn--active' : ''}`}
+                >
+                    {f.label}
+                </button>
+            ))}
+        </div>
+    );
+}
+
+// ── Helper pour couleur des barres ──
+function barColor(nb) {
+    if (nb >= 10) return 'var(--positive)';
+    if (nb >= 5) return 'oklch(62% 0.18 55)';
+    return 'var(--negative)';
+}
+
+// ── Composant ComboChart ──
+function ComboChart({ data }) {
     const [tooltip, setTooltip] = useState(null);
-    const W = 800, H = height;
-    const pad = { top: 24, right: 24, bottom: 44, left: 72 };
+
+    if (!data || data.length === 0) {
+        return (
+            <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)', fontSize: 14 }}>
+                Aucune donnée disponible
+            </div>
+        );
+    }
+
+    const W = 800, H = 340;
+    const pad = { top: 24, right: 60, bottom: 60, left: 72 };
     const iW = W - pad.left - pad.right;
     const iH = H - pad.top - pad.bottom;
 
-    const minV = Math.min(...data) * 0.97;
-    const maxV = Math.max(...data) * 1.02;
+    // Échelles
+    const prixValues = data.map(d => d.prix_m2);
+    const minPrix = Math.min(...prixValues) * 0.97;
+    const maxPrix = Math.max(...prixValues) * 1.02;
+    const maxNb = Math.max(...data.map(d => d.nb));
 
     const xOf = i => (i / (data.length - 1)) * iW;
-    const yOf = v => iH - ((v - minV) / (maxV - minV)) * iH;
+    const yOfPrix = v => iH - ((v - minPrix) / (maxPrix - minPrix)) * iH;
+    const hOfNb = nb => (nb / maxNb) * iH; // 25% de la hauteur max pour les barres
 
-    const pts = data.map((v, i) => ({ x: xOf(i), y: yOf(v), v, label: labels[i] }));
+    // Points ligne prix
+    const pts = data.map((d, i) => ({
+        x: xOf(i),
+        y: yOfPrix(d.prix_m2),
+        prix: d.prix_m2,
+        nb: d.nb,
+        label: d.trimestre,
+        i
+    }));
 
+    // Chemin ligne prix (bezier)
     const linePath = pts.reduce((acc, pt, i) => {
         if (i === 0) return `M${pt.x},${pt.y}`;
         const prev = pts[i - 1];
@@ -49,15 +187,16 @@ function LineChart({ data, labels, color = 'var(--accent)', height = 280 }) {
         return `${acc} C${cx},${prev.y} ${cx},${pt.y} ${pt.x},${pt.y}`;
     }, '');
 
-    const areaPath = `${linePath} L${pts[pts.length - 1].x},${iH} L0,${iH} Z`;
-
-    const step = (maxV - minV) / 4;
+    // Graduations Y (prix)
+    const step = (maxPrix - minPrix) / 4;
     const yTicks = Array.from({ length: 5 }, (_, i) => {
-        const v = minV + step * i;
-        return { y: yOf(v), label: Math.round(v / 1000) + 'k' };
+        const v = minPrix + step * i;
+        const labelK = Math.round(v / 100) / 10; // Arrondi à 1 décimale
+        return { y: yOfPrix(v), label: labelK + 'k' };
     });
 
-    const xLabels = labels.map((l, i) => ({ x: xOf(i), label: l, i }))
+    // Labels X (trimestres)
+    const xLabels = data.map((d, i) => ({ x: xOf(i), label: d.trimestre, i }))
         .filter((_, i) => data.length <= 10 ? true : i % 2 === 0);
 
     const gradId = `grad_${Math.random().toString(36).slice(2)}`;
@@ -66,20 +205,18 @@ function LineChart({ data, labels, color = 'var(--accent)', height = 280 }) {
         <div style={{ position: 'relative', width: '100%' }}>
             <svg
                 viewBox={`0 0 ${W} ${H}`}
-                style={{ width: '100%', height: 'auto', display: 'block', overflow: 'visible' }}
+                style={{ width: '100%', height: 'auto', display: 'block' }}
                 onMouseLeave={() => setTooltip(null)}
             >
                 <defs>
                     <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={color} stopOpacity="0.18" />
-                        <stop offset="85%" stopColor={color} stopOpacity="0.02" />
+                        <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.12" />
+                        <stop offset="100%" stopColor="var(--accent)" stopOpacity="0.02" />
                     </linearGradient>
-                    <clipPath id="chartArea">
-                        <rect x="0" y="-10" width={iW} height={iH + 10} />
-                    </clipPath>
                 </defs>
 
                 <g transform={`translate(${pad.left},${pad.top})`}>
+                    {/* Grille Y */}
                     {yTicks.map((t, i) => (
                         <g key={i}>
                             <line x1={0} y1={t.y} x2={iW} y2={t.y}
@@ -90,17 +227,76 @@ function LineChart({ data, labels, color = 'var(--accent)', height = 280 }) {
                         </g>
                     ))}
 
+                    {/* Label axe Y gauche */}
+                    <text x={-60} y={iH / 2} textAnchor="middle"
+                        fontSize="11" fill="var(--text-3)"
+                        fontFamily="var(--font-sans)"
+                        transform={`rotate(-90, -60, ${iH / 2})`}>
+                        €/m²
+                    </text>
+
+                    {/* Graduations Y droite (nb transactions) */}
+                    {(() => {
+                        // Créer 5 graduations régulières de 0 à maxNb
+                        const nbTicks = Array.from({ length: 5 }, (_, i) => {
+                            const nb = Math.ceil((maxNb / 4) * i);
+                            const y = iH - (nb / maxNb) * iH;
+                            return { nb, y };
+                        });
+
+                        return nbTicks.map(({ nb, y }) => (
+                            <g key={nb}>
+                                <text x={iW + 12} y={y + 4} textAnchor="start"
+                                    fontSize="11" fill="var(--text-3)"
+                                    fontFamily="var(--font-mono)">{nb}</text>
+                            </g>
+                        ));
+                    })()}
+
+                    {/* Label axe Y droit */}
+                    <text x={iW + 48} y={iH / 2} textAnchor="middle"
+                        fontSize="11" fill="var(--text-3)"
+                        fontFamily="var(--font-sans)"
+                        transform={`rotate(90, ${iW + 48}, ${iH / 2})`}>
+                        Nb transactions
+                    </text>
+
+                    {/* Labels X */}
                     {xLabels.map(({ x, label }) => (
-                        <text key={label} x={x} y={iH + 30} textAnchor="middle"
+                        <text key={label} x={x} y={iH + 20} textAnchor="middle"
                             fontSize="11" fill="var(--text-3)"
                             fontFamily="var(--font-sans)">{label}</text>
                     ))}
 
-                    <path d={areaPath} fill={`url(#${gradId})`} clipPath="url(#chartArea)" />
-                    <path d={linePath} fill="none" stroke={color}
-                        strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                        clipPath="url(#chartArea)" />
+                    {/* Barres volume */}
+                    {data.map((d, i) => {
+                        const h = hOfNb(d.nb);
+                        const x = xOf(i);
+                        return (
+                            <rect
+                                key={i}
+                                x={x - 4}
+                                y={iH - h}
+                                width={8}
+                                height={h}
+                                fill={barColor(d.nb)}
+                                opacity={0.6}
+                                rx={2}
+                            />
+                        );
+                    })}
 
+                    {/* Zone sous la ligne */}
+                    <path
+                        d={`${linePath} L${pts[pts.length - 1].x},${iH} L0,${iH} Z`}
+                        fill={`url(#${gradId})`}
+                    />
+
+                    {/* Ligne prix */}
+                    <path d={linePath} fill="none" stroke="var(--accent)"
+                        strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+
+                    {/* Points + zones hover */}
                     {pts.map((pt, i) => (
                         <g key={i}
                             onMouseEnter={() => setTooltip(pt)}
@@ -110,116 +306,130 @@ function LineChart({ data, labels, color = 'var(--accent)', height = 280 }) {
                                 width={iW / data.length} height={iH}
                                 fill="transparent" />
                             <circle cx={pt.x} cy={pt.y} r={tooltip?.i === i ? 5 : 3.5}
-                                fill={color} stroke="var(--surface)" strokeWidth="2"
+                                fill="var(--accent)" stroke="var(--surface)" strokeWidth="2"
                                 style={{ transition: 'r 0.1s' }} />
                         </g>
                     ))}
 
+                    {/* Tooltip */}
                     {tooltip && (() => {
-                        const tw = 168, th = 52;
+                        const tw = 180, th = 70;
                         const tx = Math.min(Math.max(tooltip.x - tw / 2, 4), iW - tw - 4);
-                        const ty = tooltip.y - th - 14;
+                        // Si trop haut, afficher en dessous du point
+                        const ty = tooltip.y < th + 20
+                            ? tooltip.y + 14
+                            : tooltip.y - th - 14;
                         return (
                             <g>
                                 <line x1={tooltip.x} y1={0} x2={tooltip.x} y2={iH}
-                                    stroke={color} strokeWidth="1" strokeDasharray="4 3" strokeOpacity="0.5" />
+                                    stroke="var(--accent)" strokeWidth="1" strokeDasharray="4 3" strokeOpacity="0.5" />
                                 <rect x={tx} y={ty} width={tw} height={th} rx="8"
                                     fill="var(--surface)" stroke="var(--border)" />
                                 <text x={tx + tw / 2} y={ty + 18} textAnchor="middle"
                                     fontSize="11" fill="var(--text-3)" fontFamily="var(--font-sans)">
                                     {tooltip.label}
                                 </text>
-                                <text x={tx + tw / 2} y={ty + 37} textAnchor="middle"
+                                <text x={tx + tw / 2} y={ty + 40} textAnchor="middle"
                                     fontSize="16" fontWeight="600" fill="var(--text-1)"
                                     fontFamily="var(--font-mono)">
-                                    {Math.round(tooltip.v).toLocaleString('fr-FR')} €/m²
+                                    {tooltip.prix.toLocaleString('fr-FR')} €/m²
+                                </text>
+                                <text x={tx + tw / 2} y={ty + 58} textAnchor="middle"
+                                    fontSize="12" fill="var(--text-3)"
+                                    fontFamily="var(--font-mono)">
+                                    {tooltip.nb} transaction{tooltip.nb > 1 ? 's' : ''}
                                 </text>
                             </g>
                         );
                     })()}
+
+                    {/* Légende */}
+                    <g transform={`translate(0, ${iH + 48})`}>
+                        {/* Légende volume (barres) */}
+                        {[
+                            { label: '≥ 10 transactions', color: 'var(--positive)', x: 0 },
+                            { label: '5–9 transactions', color: 'oklch(62% 0.18 55)', x: 140 },
+                            { label: '< 5 transactions', color: 'var(--negative)', x: 270 }
+                        ].map(({ label, color, x }) => (
+                            <g key={label} transform={`translate(${x}, 0)`}>
+                                <rect x={0} y={-8} width={8} height={12} rx={2} fill={color} opacity={0.6} />
+                                <text x={14} y={0} fontSize="11" fill="var(--text-3)" fontFamily="var(--font-sans)">
+                                    {label}
+                                </text>
+                            </g>
+                        ))}
+
+                        {/* Légende prix (ligne) */}
+                        <g transform={`translate(400, 0)`}>
+                            <line x1={0} y1={0} x2={20} y2={0} stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" />
+                            <text x={26} y={0} fontSize="11" fill="var(--text-3)" fontFamily="var(--font-sans)">
+                                Prix médian €/m²
+                            </text>
+                        </g>
+                    </g>
                 </g>
             </svg>
         </div>
     );
 }
 
-// ── Composant StatCard ──
-function StatCard({ label, value, unit, sub, trend }) {
-    const isPos = trend >= 0;
+// ── Composant InfoTooltip ──
+function InfoTooltip({ text }) {
+    const [visible, setVisible] = useState(false);
+
     return (
-        <div style={{
-            background: 'var(--surface)', border: '1px solid var(--border-subtle)',
-            borderRadius: 'var(--radius-md)', padding: '20px 24px',
-            flex: 1, minWidth: 0,
-            boxShadow: 'var(--shadow-sm)',
-        }}>
-            <div style={{ fontSize: 12, color: 'var(--text-3)', fontFamily: 'var(--font-mono)', marginBottom: 10, letterSpacing: '0.03em' }}>
-                {label}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 6 }}>
-                <span style={{ fontFamily: 'var(--font-mono)', fontSize: 26, fontWeight: 500, color: 'var(--text-1)', letterSpacing: '-0.04em' }}>
-                    {typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
-                </span>
-                {unit && <span style={{ fontSize: 13, color: 'var(--text-3)', fontFamily: 'var(--font-mono)' }}>{unit}</span>}
-            </div>
-            {(sub || trend !== undefined) && (
-                <div style={{ marginTop: 8, fontSize: 12, color: 'var(--text-3)', display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {sub}
-                    {trend !== undefined && (
-                        <span style={{
-                            fontSize: 11, fontFamily: 'var(--font-mono)', fontWeight: 500,
-                            color: isPos ? 'var(--positive)' : 'var(--negative)',
-                            background: isPos ? 'var(--positive-subtle)' : 'var(--negative-subtle)',
-                            padding: '2px 6px', borderRadius: 99,
-                        }}>
-                            {isPos ? '+' : ''}{trend}%
-                        </span>
-                    )}
+        <div
+            className="info-tooltip"
+            onMouseEnter={() => setVisible(true)}
+            onMouseLeave={() => setVisible(false)}
+        >
+            <button className="info-tooltip__btn">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                    <path d="M5 4.5v3M5 2.5v.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                </svg>
+            </button>
+
+            {visible && (
+                <div className="info-tooltip__popup">
+                    <div className="info-tooltip__arrow" />
+                    <p className="info-tooltip__text">{text}</p>
                 </div>
             )}
         </div>
     );
 }
 
-// ── Composant FilterPill ──
-function FilterPill({ label, active, onClick }) {
-    return (
-        <button onClick={onClick} style={{
-            padding: '6px 14px', borderRadius: 99, fontSize: 13,
-            fontFamily: 'var(--font-sans)', fontWeight: active ? 500 : 400,
-            border: `1px solid ${active ? 'var(--accent)' : 'var(--border)'}`,
-            background: active ? 'var(--accent-subtle)' : 'var(--surface)',
-            color: active ? 'var(--accent-text)' : 'var(--text-2)',
-            cursor: 'pointer',
-            transition: 'all 0.15s',
-        }}>
-            {label}
-        </button>
-    );
-}
-
+// ── Composant principal ──
 function Commune({ commune, onNavigate }) {
-    const [typeFilter, setTypeFilter] = useState('appartement');
-    const [roomFilter, setRoomFilter] = useState('all');
     const [cityData, setCityData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [typeFilter, setTypeFilter] = useState('tous');
 
-    // Charger les données réelles depuis Supabase
+    // Charger les données
     useEffect(() => {
         async function loadData() {
             if (!commune) return;
 
             setLoading(true);
             const agregats = await getAggregatsCommune(commune.code_commune);
-            const formatted = formatAggregatsForChart(agregats);
+            const formatted = formatCommuneData(agregats, typeFilter);
             setCityData(formatted);
             setLoading(false);
         }
 
         loadData();
-    }, [commune]);
+    }, [commune, typeFilter]);
 
-    const city = cityData;
+    // Navigation clavier
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape' || e.key === 'Backspace') {
+                onNavigate('home');
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [onNavigate]);
 
     if (!commune) {
         return (
@@ -244,7 +454,7 @@ function Commune({ commune, onNavigate }) {
         );
     }
 
-    if (!cityData || !cityData.priceHistory) {
+    if (!cityData || !cityData.graphique_prix) {
         return (
             <main className="commune-page">
                 <div className="commune-error">
@@ -257,115 +467,46 @@ function Commune({ commune, onNavigate }) {
         );
     }
 
-
-    const hist = city.priceHistory?.[typeFilter]?.[roomFilter]
-        || city.priceHistory?.[typeFilter]?.all
-        || [];
-
-    const firstV = hist[0] || 1;
-    const lastV = hist[hist.length - 1] || 1;
-    const evol = ((lastV - firstV) / firstV * 100).toFixed(1);
-
-    const roomOptions = [
-        { key: 'all', label: 'Tous' },
-        { key: '2p', label: '2 pièces' },
-        { key: '3p', label: '3 pièces' },
-    ];
-
     return (
-        <main style={{ maxWidth: 1200, margin: '0 auto', padding: '40px 24px 80px' }}>
+        <div style={{ minHeight: 'calc(100vh - 56px)', background: 'var(--bg)' }}>
+            <main style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 80px' }}>
 
-            {/* Header */}
-            <div style={{ marginBottom: 36 }}>
-                <button onClick={() => onNavigate('home')} className="commune-back-btn">
-                    ← Retour
-                </button>
+                {/* Header */}
+                <CommuneHeader
+                    commune={commune}
+                    fiabilite={cityData.fiabilite}
+                    onNavigate={onNavigate}
+                />
 
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginTop: 24, flexWrap: 'wrap', gap: 16 }}>
-                    <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                            <h1 style={{
-                                fontFamily: 'var(--font-display)', fontWeight: 800,
-                                fontSize: 'clamp(26px, 4vw, 36px)', letterSpacing: '-0.04em',
-                                color: 'var(--text-1)',
-                            }}>
-                                {commune.nom_commune}
-                            </h1>
-                            <span style={{
-                                fontSize: 13, fontFamily: 'var(--font-mono)',
-                                color: 'var(--text-3)', background: 'var(--surface-2)',
-                                padding: '3px 8px', borderRadius: 6,
-                                border: '1px solid var(--border-subtle)',
-                            }}>{commune.code_commune}</span>
+                {/* Graphique principal */}
+                <div className="chart-card">
+                    <div className="chart-card__header">
+                        <div className="chart-card__title-group">
+                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" className="chart-card__icon">
+                                <path d="M2 12l4-4.5 3 3 4.5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                            <h2 className="chart-card__title">
+                                Évolution prix médian / m² + volume
+                            </h2>
+                            <span className="chart-card__subtitle">DVF · Trimestriel</span>
+                            <InfoTooltip text="Ces données sont calculées sur l'ensemble des transactions trouvées sur DVF pour la période. Le volume de transactions est indiqué pour donner du contexte sur la pertinence de l'information." />
                         </div>
-                        {commune.population && (
-                            <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 4 }}>
-                                {commune.population.toLocaleString('fr-FR')} habitants
-                            </div>
-                        )}
+                        <FiltresTabs
+                            filtresDisponibles={cityData.filtres_disponibles}
+                            active={typeFilter}
+                            onChange={setTypeFilter}
+                        />
                     </div>
-                </div>
-            </div>
-
-            {/* Stats */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 32, flexWrap: 'wrap' }}>
-                <StatCard label="MÉDIANE €/M²" value={city.stats.mediane} unit="€/m²"
-                    sub="12 derniers mois" trend={city.stats.tendance} />
-                <StatCard label="TRANSACTIONS" value={city.stats.volume} unit="ventes"
-                    sub="sur les 12 derniers mois" />
-                <StatCard label="ÉVOLUTION" value={evol > 0 ? `+${evol}` : evol} unit="%"
-                    sub="depuis jan. 2021" trend={parseFloat(evol)} />
-            </div>
-
-            {/* Chart card */}
-            <div style={{
-                background: 'var(--surface)', border: '1px solid var(--border-subtle)',
-                borderRadius: 'var(--radius-lg)', padding: '24px',
-                boxShadow: 'var(--shadow-sm)',
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
-                    <div>
-                        <h2 style={{
-                            fontFamily: 'var(--font-display)', fontWeight: 600,
-                            fontSize: 15, color: 'var(--text-1)', letterSpacing: '-0.02em',
-                        }}>
-                            Prix au m² — évolution
-                        </h2>
-                        <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2, fontFamily: 'var(--font-mono)' }}>
-                            Source DVF · Transactions effectives
-                        </p>
-                    </div>
-
-                    {/* Filters */}
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                        <FilterPill label="Appartement" active={typeFilter === 'appartement'} onClick={() => { setTypeFilter('appartement'); setRoomFilter('all'); }} />
-                        <FilterPill label="Maison" active={typeFilter === 'maison'} onClick={() => { setTypeFilter('maison'); setRoomFilter('all'); }} />
-                        {typeFilter === 'appartement' && (
-                            <>
-                                <div style={{ width: 1, background: 'var(--border-subtle)', alignSelf: 'stretch', margin: '0 2px' }} />
-                                {roomOptions.map(o => (
-                                    <FilterPill key={o.key} label={o.label} active={roomFilter === o.key} onClick={() => setRoomFilter(o.key)} />
-                                ))}
-                            </>
-                        )}
-                    </div>
+                    <ComboChart data={cityData.graphique_prix} />
                 </div>
 
-                {hist.length > 0 ? (
-                    <LineChart data={hist} labels={city.labels || []} height={300} />
-                ) : (
-                    <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)', fontSize: 14 }}>
-                        Données non disponibles pour ce filtre
-                    </div>
-                )}
-            </div>
+                {/* TODO: Stats et évolution annuelle */}
+                <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-3)' }}>
+                    Stats et évolution annuelle à venir...
+                </div>
 
-            {/* Footer note */}
-            <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 20, fontFamily: 'var(--font-mono)', lineHeight: 1.6 }}>
-                Les données sont issues des Demandes de Valeurs Foncières (DVF) publiées par la Direction Générale des Finances Publiques.
-                Elles représentent les transactions immobilières enregistrées auprès des services de publicité foncière.
-            </p>
-        </main>
+            </main>
+        </div>
     );
 }
 
