@@ -2,6 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { getAggregatsCommune, formatCommuneData } from '../../services/aggregatsService';
 import Icon from '../common/Icon';
 import './Commune.css';
+import './CommuneHeader.css';
+import './Chart.css';
+import './Stats.css';
+import './EvolAnnuelle.css';
 
 // ── Configuration fiabilité ──
 const FIABILITE_CONFIG = {
@@ -727,6 +731,13 @@ function Commune({ commune, onNavigate }) {
 
                 {/* Évolution annuelle */}
                 <EvolAnnuelle data={cityData.evolution_annuelle} />
+
+                {/* Bouton retour */}
+                <div style={{ marginTop: 40, textAlign: 'center' }}>
+                    <button onClick={() => onNavigate('home')} className="commune-back-btn">
+                        ← Retour à l'accueil
+                    </button>
+                </div>
 
             </main>
         </div>

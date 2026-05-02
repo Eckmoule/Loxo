@@ -1,0 +1,126 @@
+/* Header commune */
+.commune-header {
+    padding: 32px 0 24px;
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: 28px;
+}
+
+.commune-header__content {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.commune-header__title-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.commune-header__title {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(24px, 4vw, 36px);
+    letter-spacing: -0.04em;
+    color: var(--text-1);
+    line-height: 1;
+}
+
+.commune-header__code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-3);
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+.commune-header__meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.commune-header__fiabilite {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px 4px 7px;
+    border-radius: 99px;
+}
+
+.commune-header__fiabilite-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.commune-header__fiabilite-label {
+    font-size: 12px;
+    font-weight: 600;
+    font-family: var(--font-sans);
+}
+
+.commune-header__meta-text {
+    font-size: 12px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+}
+
+.commune-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.commune-header__btn {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 16px;
+    height: 38px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.commune-header__btn--secondary {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-1);
+    box-shadow: var(--shadow-sm);
+}
+
+.commune-header__btn--secondary:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.commune-header__btn--primary {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+}
+
+.commune-header__btn--primary:hover {
+    background: var(--accent-hover);
+}
+
+.commune-header__btn--active {
+    background: var(--positive-subtle);
+    color: var(--positive);
+    border: 1px solid var(--positive);
+    box-shadow: none;
+}

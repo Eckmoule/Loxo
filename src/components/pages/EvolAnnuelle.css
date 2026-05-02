@@ -1,0 +1,100 @@
+/* Évolution annuelle */
+.evol-annuelle {
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.evol-annuelle__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.evol-annuelle__icon {
+    color: var(--text-2);
+}
+
+.evol-annuelle__title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-1);
+    letter-spacing: -0.02em;
+}
+
+.evol-annuelle__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.evol-annuelle__row {
+    display: grid;
+    grid-template-columns: 40px 1fr 160px;
+    align-items: center;
+    gap: 12px;
+}
+
+.evol-annuelle__year {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-2);
+}
+
+.evol-annuelle__bar-container {
+    height: 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.evol-annuelle__bar-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-subtle);
+}
+
+.evol-annuelle__bar-ref {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-3);
+}
+
+.evol-annuelle__bar {
+    position: absolute;
+    height: 16px;
+    border-radius: 3px;
+    opacity: 0.8;
+}
+
+.evol-annuelle__value {
+    text-align: right;
+}
+
+.evol-annuelle__value-ref {
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+}
+
+.evol-annuelle__value-pct {
+    font-size: 12px;
+    font-family: var(--font-mono);
+    font-weight: 500;
+}
+
+.evol-annuelle__value-price {
+    color: var(--text-3);
+    font-weight: 400;
+    margin-left: 4px;
+}

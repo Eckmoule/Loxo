@@ -1,0 +1,129 @@
+/* Stats tiles */
+.stats-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.stat-tile {
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 20px 24px;
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-tile__label {
+    font-size: 11px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    margin-bottom: 12px;
+    letter-spacing: 0.03em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stat-tile__value-group {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.stat-tile__value {
+    font-family: var(--font-mono);
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--text-1);
+    letter-spacing: -0.04em;
+}
+
+.stat-tile__unit {
+    font-size: 13px;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+}
+
+.stat-tile__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-3);
+}
+
+.stat-tile__trend {
+    font-size: 11px;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    padding: 2px 6px;
+    border-radius: 99px;
+}
+
+.stat-tile__trend--up {
+    color: var(--positive);
+    background: var(--positive-subtle);
+}
+
+.stat-tile__trend--down {
+    color: var(--negative);
+    background: var(--negative-subtle);
+}
+
+.stat-tile__trend--stable {
+    color: var(--text-3);
+    background: var(--surface-2);
+}
+
+/* Pie chart */
+.stat-tile__pie {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.stat-tile__pie-chart {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+}
+
+.stat-tile__pie-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+
+.stat-tile__pie-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.stat-tile__pie-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-2);
+    font-family: var(--font-sans);
+}
+
+.stat-tile__pie-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.stat-tile__pie-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-1);
+    font-family: var(--font-mono);
+}
