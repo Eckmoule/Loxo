@@ -554,6 +554,73 @@ function StatTiles({ stats }) {
     );
 }
 
+// ── Composant EvolAnnuelle ──
+function EvolAnnuelle({ data }) {
+    if (!data || data.length === 0) return null;
+
+    // Trouver la variation max en valeur absolue pour l'échelle
+    const maxAbs = Math.max(...data.map(d => Math.abs(d.variation_pct || 0)));
+
+    return (
+        <div className="evol-annuelle">
+            <div className="evol-annuelle__header">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" className="evol-annuelle__icon">
+                    <path d="M5 1.5v12M1.5 5.5H5M1.5 9.5H5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+                </svg>
+                <h3 className="evol-annuelle__title">
+                    Évolution par année
+                </h3>
+            </div>
+
+            <div className="evol-annuelle__rows">
+                {[...data].reverse().map(d => {
+                    const isRef = d.variation_pct === null;
+                    const isPos = d.variation_pct > 0;
+                    const pct = d.variation_pct;
+                    const barW = isRef ? 0 : (Math.abs(pct) / maxAbs) * 42;
+                    const bColor = isRef ? 'var(--text-3)' : isPos ? 'var(--positive)' : 'var(--negative)';
+
+                    return (
+                        <div key={d.annee} className="evol-annuelle__row">
+                            <span className="evol-annuelle__year">{d.annee}</span>
+
+                            {/* Barre centrée */}
+                            <div className="evol-annuelle__bar-container">
+                                <div className="evol-annuelle__bar-line" />
+                                {isRef ? (
+                                    <div className="evol-annuelle__bar-ref" />
+                                ) : (
+                                    <div
+                                        className="evol-annuelle__bar"
+                                        style={{
+                                            left: isPos ? '50%' : `calc(50% - ${barW}%)`,
+                                            width: `${barW}%`,
+                                            background: bColor,
+                                        }}
+                                    />
+                                )}
+                            </div>
+
+                            <div className="evol-annuelle__value">
+                                {isRef ? (
+                                    <span className="evol-annuelle__value-ref">
+                                        {d.prix_m2.toLocaleString('fr-FR')} € <span style={{ opacity: 0.5 }}>(réf.)</span>
+                                    </span>
+                                ) : (
+                                    <span className="evol-annuelle__value-pct" style={{ color: bColor }}>
+                                        {pct > 0 ? '+' : ''}{pct}%
+                                        <span className="evol-annuelle__value-price">({d.prix_m2.toLocaleString('fr-FR')} €)</span>
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
+
 // ── Composant principal ──
 function Commune({ commune, onNavigate }) {
     const [cityData, setCityData] = useState(null);
@@ -658,10 +725,8 @@ function Commune({ commune, onNavigate }) {
                 {/* Stats tiles */}
                 <StatTiles stats={cityData.stats_12_mois} />
 
-                {/* TODO: Évolution annuelle */}
-                <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-3)' }}>
-                    Évolution annuelle à venir...
-                </div>
+                {/* Évolution annuelle */}
+                <EvolAnnuelle data={cityData.evolution_annuelle} />
 
             </main>
         </div>
