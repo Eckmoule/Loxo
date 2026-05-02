@@ -399,6 +399,161 @@ function InfoTooltip({ text }) {
     );
 }
 
+// ── Helper pour icône de direction ──
+function dirArrow(dir) {
+    if (dir === 'up') return { sym: '↗', color: 'var(--positive)', bg: 'var(--positive-subtle)' };
+    if (dir === 'down') return { sym: '↘', color: 'var(--negative)', bg: 'var(--negative-subtle)' };
+    return { sym: '→', color: 'var(--text-3)', bg: 'var(--surface-2)' };
+}
+
+// ── Composant StatTile ──
+function StatTile({ label, value, unit, sub, trend, trendValue, children, infoText }) {
+    const arrow = trend ? dirArrow(trend) : null;
+
+    return (
+        <div className="stat-tile">
+            <div className="stat-tile__label">
+                {label}
+                {infoText && <InfoTooltip text={infoText} />}
+            </div>
+
+            <div className="stat-tile__value-group">
+                <span className="stat-tile__value">
+                    {typeof value === 'number' ? value.toLocaleString('fr-FR') : value}
+                </span>
+                {unit && <span className="stat-tile__unit">{unit}</span>}
+            </div>
+
+            {(sub || trend) && (
+                <div className="stat-tile__meta">
+                    {sub && <span>{sub}</span>}
+                    {trend && trendValue !== undefined && (
+                        <span className={`stat-tile__trend stat-tile__trend--${trend}`}>
+                            {arrow.sym} {trendValue > 0 ? '+' : ''}{trendValue}%
+                        </span>
+                    )}
+                </div>
+            )}
+
+            {children}
+        </div>
+    );
+}
+
+// ── Composant PieChart ──
+function PieChart({ maisons, appartements }) {
+    const total = maisons + appartements;
+    if (total === 0) return null;
+
+    const maisonsPct = (maisons / total) * 100;
+    const appartsPct = (appartements / total) * 100;
+
+    // SVG pie chart
+    const radius = 28;
+    const circumference = 2 * Math.PI * radius;
+    const maisonsLength = (maisonsPct / 100) * circumference;
+    const appartsOffset = maisonsLength;
+
+    return (
+        <div className="stat-tile__pie">
+            <svg className="stat-tile__pie-chart" viewBox="0 0 64 64">
+                <circle
+                    cx="32"
+                    cy="32"
+                    r={radius}
+                    fill="none"
+                    stroke="oklch(62% 0.18 305)"
+                    strokeWidth="8"
+                    strokeDasharray={`${maisonsLength} ${circumference}`}
+                    transform="rotate(-90 32 32)"
+                />
+                <circle
+                    cx="32"
+                    cy="32"
+                    r={radius}
+                    fill="none"
+                    stroke="oklch(62% 0.18 55)"
+                    strokeWidth="8"
+                    strokeDasharray={`${circumference - maisonsLength} ${circumference}`}
+                    strokeDashoffset={-appartsOffset}
+                    transform="rotate(-90 32 32)"
+                />
+            </svg>
+
+            <div className="stat-tile__pie-legend">
+                <div className="stat-tile__pie-item">
+                    <div className="stat-tile__pie-label">
+                        <span className="stat-tile__pie-dot" style={{ background: 'oklch(62% 0.18 305)' }} />
+                        <span>Maisons</span>
+                    </div>
+                    <span className="stat-tile__pie-value">{Math.round(maisonsPct)}%</span>
+                </div>
+                <div className="stat-tile__pie-item">
+                    <div className="stat-tile__pie-label">
+                        <span className="stat-tile__pie-dot" style={{ background: 'oklch(62% 0.18 55)' }} />
+                        <span>Apparts</span>
+                    </div>
+                    <span className="stat-tile__pie-value">{Math.round(appartsPct)}%</span>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ── Composant StatTiles (les 4 tuiles) ──
+function StatTiles({ stats }) {
+    if (!stats) return null;
+
+    return (
+        <div className="stats-tiles">
+            {/* 1. Prix médian m² */}
+            <StatTile
+                label="PRIX MÉDIAN M²"
+                value={stats.prix_m2.valeur}
+                unit="€/m²"
+                sub="12 derniers mois"
+                trend={stats.prix_m2.direction}
+                trendValue={stats.prix_m2.evolution_pct}
+                infoText="Prix médian au m² calculé sur les 12 derniers mois (4 derniers trimestres). L'évolution compare ces 12 mois aux 12 mois précédents."
+            />
+
+            {/* 2. Coût achat moyen */}
+            <StatTile
+                label="COÛT ACHAT MOYEN"
+                value={stats.achat_moyen.valeur}
+                unit="€"
+                sub="12 derniers mois"
+                trend={stats.achat_moyen.direction}
+                trendValue={stats.achat_moyen.evolution_pct}
+                infoText="Prix médian total d'un bien calculé sur les 12 derniers mois. Cela donne une idée du budget nécessaire pour acheter dans cette commune."
+            />
+
+            {/* 3. Répartition M/A */}
+            <StatTile
+                label="RÉPARTITION"
+                value=""
+                infoText="Répartition entre maisons et appartements parmi les transactions des 12 derniers mois."
+            >
+                <PieChart
+                    maisons={stats.repartition.maisons_pct}
+                    appartements={stats.repartition.appartements_pct}
+                />
+            </StatTile>
+
+            {/* 4. Transactions */}
+            <StatTile
+                label="TRANSACTIONS"
+                value={stats.transactions.total}
+                unit="ventes"
+                sub="12 derniers mois"
+                trend={stats.transactions.direction}
+                trendValue={stats.transactions.evolution_pct}
+                infoText="Nombre total de transactions enregistrées sur les 12 derniers mois. L'évolution compare au volume des 12 mois précédents."
+            />
+        </div>
+    );
+}
+
 // ── Composant principal ──
 function Commune({ commune, onNavigate }) {
     const [cityData, setCityData] = useState(null);
@@ -500,9 +655,12 @@ function Commune({ commune, onNavigate }) {
                     <ComboChart data={cityData.graphique_prix} />
                 </div>
 
-                {/* TODO: Stats et évolution annuelle */}
+                {/* Stats tiles */}
+                <StatTiles stats={cityData.stats_12_mois} />
+
+                {/* TODO: Évolution annuelle */}
                 <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-3)' }}>
-                    Stats et évolution annuelle à venir...
+                    Évolution annuelle à venir...
                 </div>
 
             </main>
