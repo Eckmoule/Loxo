@@ -579,10 +579,11 @@ function EvolAnnuelle({ data }) {
             <div className="evol-annuelle__rows">
                 {[...data].reverse().map(d => {
                     const isRef = d.variation_pct === null;
+                    const isZero = d.variation_pct === 0;
                     const isPos = d.variation_pct > 0;
                     const pct = d.variation_pct;
-                    const barW = isRef ? 0 : (Math.abs(pct) / maxAbs) * 42;
-                    const bColor = isRef ? 'var(--text-3)' : isPos ? 'var(--positive)' : 'var(--negative)';
+                    const barW = (isRef || isZero) ? 0 : (Math.abs(pct) / maxAbs) * 42;
+                    const bColor = isRef ? 'var(--text-3)' : isZero ? 'var(--text-3)' : isPos ? 'var(--positive)' : 'var(--negative)';
 
                     return (
                         <div key={d.annee} className="evol-annuelle__row">
@@ -591,7 +592,7 @@ function EvolAnnuelle({ data }) {
                             {/* Barre centrée */}
                             <div className="evol-annuelle__bar-container">
                                 <div className="evol-annuelle__bar-line" />
-                                {isRef ? (
+                                {(isRef || isZero) ? (
                                     <div className="evol-annuelle__bar-ref" />
                                 ) : (
                                     <div
