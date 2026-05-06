@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { getTransactionsCommune } from '../../services/transactionsService';
+import { getTransactionsCommune, getAnneesDisponibles } from '../../services/transactionsService';
 import './CommuneTransactions.css';
 
 // ── Helpers dates et formatage ──
@@ -32,7 +32,7 @@ function getYear(iso) {
 // ── Valeurs par défaut des filtres ──
 const DEFAULTS = {
     type: 'tous',
-    annees: [2025, 2024],
+    annees: [],
     prix_total: [0, 10000000], // Min/max à ajuster dynamiquement
     prix_m2: [0, 20000],
     rue: '',
@@ -197,7 +197,7 @@ function FiltersPanel({ filters, onChange, onReset, count }) {
                 <Group label="Période">
                     <Sublabel>Année</Sublabel>
                     <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12 }}>
-                        {[2025, 2024, 2023, 2022, 2021].map(y => (
+                        {filters.anneesDisponibles?.map(y => (
                             <Pill key={y} active={filters.annees.includes(y)} onClick={() => toggle('annees', y)}>{y}</Pill>
                         ))}
                     </div>
@@ -328,26 +328,41 @@ function EmptyState({ onReset }) {
 }
 
 // ── Composant principal ──
-function CommuneTransactions({ commune, onNavigate }) {
+function CommuneTransactions({ commune, onNavigate, typeFilter }) {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filters, setFilters] = useState(DEFAULTS);
+    const [filters, setFilters] = useState(() => ({
+        ...DEFAULTS,
+        type: typeFilter || 'tous'
+    }));
     const [sort, setSort] = useState('date_desc');
     const [limit, setLimit] = useState(20);
+    const [cachedYears, setCachedYears] = useState([]);
 
     // Charger les transactions
     useEffect(() => {
-        async function loadTransactions() {
+        async function loadInitialTransactions() {
             if (!commune) return;
 
             setLoading(true);
-            const data = await getTransactionsCommune(commune.code_commune);
-            setTransactions(data);
 
-            // Ajuster les filtres avec les min/max dynamiques
+            // 1. Récupérer les années disponibles
+            const anneesDisponibles = await getAnneesDisponibles(commune.code_commune);
+            const deuxDernieresAnnees = anneesDisponibles.slice(0, 2);
+
+            // 2. Charger uniquement les transactions des 2 dernières années
+            const data = await getTransactionsCommune(commune.code_commune, deuxDernieresAnnees);
+
+            setTransactions(data);
+            setCachedYears(deuxDernieresAnnees);
+
+            // 3. Ajuster les filtres
             const stats = getStatsFromTransactions(data);
+
             setFilters(prev => ({
                 ...prev,
+                annees: deuxDernieresAnnees,
+                anneesDisponibles: anneesDisponibles,
                 prix_total: [stats.prix_total_min, stats.prix_total_max],
                 prix_m2: [stats.prix_m2_min, stats.prix_m2_max],
                 prix_total_min: stats.prix_total_min,
@@ -359,8 +374,33 @@ function CommuneTransactions({ commune, onNavigate }) {
             setLoading(false);
         }
 
-        loadTransactions();
+        loadInitialTransactions();
     }, [commune]);
+
+    // Recharger les transactions quand les années sélectionnées changent
+    useEffect(() => {
+        async function loadMissingYears() {
+            if (!commune || !filters.annees || filters.annees.length === 0) return;
+
+            // Trouver les années qui ne sont pas encore en cache
+            const missingYears = filters.annees.filter(y => !cachedYears.includes(y));
+
+            if (missingYears.length === 0) return; // Toutes les années sont déjà chargées
+
+            setLoading(true);
+
+            // Charger uniquement les années manquantes
+            const newData = await getTransactionsCommune(commune.code_commune, missingYears);
+
+            // Fusionner avec les données existantes
+            setTransactions(prev => [...prev, ...newData]);
+            setCachedYears(prev => [...prev, ...missingYears]);
+
+            setLoading(false);
+        }
+
+        loadMissingYears();
+    }, [filters.annees, commune, cachedYears]);
 
     // Appliquer filtres et tri
     const filtered = useMemo(() => {

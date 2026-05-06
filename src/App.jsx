@@ -71,7 +71,7 @@ function App() {
       />
       {screen === 'home' && <Home onNavigate={handleNavigate} />}
       {screen === 'commune' && <Commune commune={screenData.commune} onNavigate={handleNavigate} />}
-      {screen === 'transactions' && <CommuneTransactions commune={screenData.commune} onNavigate={handleNavigate} />}
+      {screen === 'transactions' && <CommuneTransactions commune={screenData.commune} typeFilter={screenData.typeFilter} onNavigate={handleNavigate} />}
       {screen === 'contact' && <Contact onNavigate={handleNavigate} user={user} />}
       {screen === 'signin' && <SignIn onNavigate={handleNavigate} />}
       {screen === 'signup' && <SignUp onNavigate={handleNavigate} />}

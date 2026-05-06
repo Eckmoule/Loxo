@@ -1,23 +1,59 @@
 import { supabase } from '../lib/supabase';
 
 /**
+ * Récupère les années disponibles pour une commune (sans charger toutes les transactions)
+ * @param {string} codeCommune - Code INSEE de la commune
+ * @returns {Promise<Array<number>>} Liste des années disponibles triées (plus récente en premier)
+ */
+export async function getAnneesDisponibles(codeCommune) {
+    try {
+        const { data, error } = await supabase
+            .rpc('get_annees_disponibles', { code_commune_param: codeCommune });
+
+        if (error) throw error;
+
+        // La fonction retourne [{annee: 2025}, {annee: 2024}, ...]
+        return (data || []).map(row => row.annee);
+    } catch (error) {
+        console.error('Erreur récupération années disponibles:', error);
+        return [];
+    }
+}
+/**
  * Récupère les transactions d'une commune 
  */
-export async function getTransactionsCommune(codeCommune) {
+export async function getTransactionsCommune(codeCommune, annees = null) {
     try {
         const allTransactions = [];
         let start = 0;
         const pageSize = 1000;
         let hasMore = true;
 
-        // Paginer jusqu'à récupérer toutes les transactions
+        // Construire la requête de base
+        let query = supabase
+            .from('transactions')
+            .select('id, date_mutation, type_local, nombre_pieces_principales, surface_reelle_bati, surface_terrain, numero_voie, nom_voie, valeur_fonciere', { count: 'exact' })
+            .eq('code_commune', codeCommune)
+            .order('date_mutation', { ascending: false });
+
+        // Filtrer par années si spécifié
+        if (annees && annees.length > 0) {
+            const dateRanges = annees.map(year => ({
+                start: `${year}-01-01`,
+                end: `${year}-12-31`
+            }));
+
+            // Construire un filtre OR pour chaque année
+            const filters = dateRanges.map((range, i) =>
+                `date_mutation.gte.${range.start},date_mutation.lte.${range.end}`
+            ).join(',');
+
+            query = query.or(filters);
+        }
+
+        // Paginer
         while (hasMore) {
-            const { data, error, count } = await supabase
-                .from('transactions')
-                .select('id, date_mutation, type_local, nombre_pieces_principales, surface_reelle_bati, surface_terrain, numero_voie, nom_voie, valeur_fonciere', { count: 'exact' })
-                .eq('code_commune', codeCommune)
-                .order('date_mutation', { ascending: false })
-                .range(start, start + pageSize - 1);
+            const { data, error } = await query.range(start, start + pageSize - 1);
 
             if (error) throw error;
 
@@ -30,7 +66,7 @@ export async function getTransactionsCommune(codeCommune) {
             }
         }
 
-        // Formater les données pour le frontend
+        // Formater les données
         return allTransactions.map(t => ({
             id: t.id,
             date_mutation: t.date_mutation,

@@ -32,3 +32,15 @@ ALTER TABLE transactions
 -- Commentaires pour documentation
 COMMENT ON COLUMN transactions.numero_voie IS 'Numéro de voie (ex: 12, 12bis)';
 COMMENT ON COLUMN transactions.nom_voie IS 'Nom de la voie (ex: de la République)';
+
+-- Création d'une fonction retournant les années disponibles
+CREATE OR REPLACE FUNCTION get_annees_disponibles(code_commune_param TEXT)
+RETURNS TABLE(annee INTEGER) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT DISTINCT EXTRACT(YEAR FROM date_mutation)::INTEGER AS annee
+  FROM transactions
+  WHERE code_commune = code_commune_param
+  ORDER BY annee DESC;
+END;
+$$ LANGUAGE plpgsql;

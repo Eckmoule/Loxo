@@ -30,7 +30,7 @@ const FIABILITE_CONFIG = {
 };
 
 // ── Composant Header ──
-function CommuneHeader({ commune, fiabilite, onNavigate }) {
+function CommuneHeader({ commune, fiabilite, onNavigate, typeFilter }) {
     const [alertSent, setAlertSent] = useState(false);
     const f = FIABILITE_CONFIG[fiabilite.niveau];
 
@@ -88,7 +88,7 @@ function CommuneHeader({ commune, fiabilite, onNavigate }) {
                 <div className="commune-header__actions">
                     {/* Voir transactions */}
                     <button
-                        onClick={() => onNavigate('transactions', { commune })}
+                        onClick={() => onNavigate('transactions', { commune, typeFilter })}
                         className="commune-header__btn commune-header__btn--secondary"
                     >
                         <Icon name="document" size={14} color="var(--text-2)" />
@@ -713,6 +713,7 @@ function Commune({ commune, onNavigate }) {
                     commune={commune}
                     fiabilite={cityData.fiabilite}
                     onNavigate={onNavigate}
+                    typeFilter={typeFilter}
                 />
 
                 {/* Graphique principal */}
