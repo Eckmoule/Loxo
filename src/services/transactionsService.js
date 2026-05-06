@@ -38,17 +38,12 @@ export async function getTransactionsCommune(codeCommune, annees = null) {
 
         // Filtrer par années si spécifié
         if (annees && annees.length > 0) {
-            const dateRanges = annees.map(year => ({
-                start: `${year}-01-01`,
-                end: `${year}-12-31`
-            }));
-
-            // Construire un filtre OR pour chaque année
-            const filters = dateRanges.map((range, i) =>
-                `date_mutation.gte.${range.start},date_mutation.lte.${range.end}`
+            // Créer des filtres OR corrects pour Supabase
+            const orFilters = annees.map(year =>
+                `and(date_mutation.gte.${year}-01-01,date_mutation.lte.${year}-12-31)`
             ).join(',');
 
-            query = query.or(filters);
+            query = query.or(orFilters);
         }
 
         // Paginer
