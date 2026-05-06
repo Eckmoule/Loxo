@@ -87,13 +87,28 @@ function CommuneHeader({ commune, fiabilite, onNavigate, typeFilter }) {
                 {/* Right — CTAs */}
                 <div className="commune-header__actions">
                     {/* Voir transactions */}
-                    <button
-                        onClick={() => onNavigate('transactions', { commune, typeFilter })}
-                        className="commune-header__btn commune-header__btn--secondary"
-                    >
-                        <Icon name="document" size={14} color="var(--text-2)" />
-                        Voir les transactions
-                    </button>
+                    {['69123', '75056', '13055'].includes(commune.code_commune) ? (
+                        <div className="commune-header__btn-tooltip">
+                            <button
+                                disabled
+                                className="commune-header__btn commune-header__btn--secondary commune-header__btn--disabled"
+                            >
+                                <Icon name="document" size={14} />
+                                Voir les transactions
+                            </button>
+                            <span className="commune-header__btn-tooltip-text">
+                                Veuillez naviguer par arrondissement pour le détail
+                            </span>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => onNavigate('transactions', { commune, typeFilter })}
+                            className="commune-header__btn commune-header__btn--secondary"
+                        >
+                            <Icon name="document" size={14} />
+                            Voir les transactions
+                        </button>
+                    )}
 
                     {/* Alerte */}
                     <button

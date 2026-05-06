@@ -126,7 +126,14 @@ function Icon({ name, size = 16, color = 'currentColor', className = '' }) {
       <svg width={size} height={size} viewBox="0 0 13 13" fill="none" className={className}>
         <path d="M6.5 1.5a4 4 0 014 4c0 1.8.4 2.8.9 3.2H1.6c.5-.4.9-1.4.9-3.2a4 4 0 014-4z" stroke={color} strokeWidth="1.3" />
         <path d="M5 8.7a1.5 1.5 0 003 0" stroke={color} strokeWidth="1.3" />
-      </svg>),
+      </svg>
+    ),
+    calendar: (
+      <svg width={size} height={size} viewBox="0 0 12 12" fill="none" className={className}>
+        <rect x="2" y="2" width="8" height="8" rx="1" stroke={color} strokeWidth="1.2" />
+        <path d="M4 1v2M8 1v2M2 5h8" stroke={color} strokeWidth="1.2" />
+      </svg>
+    ),
   };
 
   return icons[name] || null;

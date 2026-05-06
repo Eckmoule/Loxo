@@ -1,15 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import { getTransactionsCommune, getAnneesDisponibles } from '../../services/transactionsService';
+import Icon from '../common/Icon';
 import './CommuneTransactions.css';
 
 // ── Helpers dates et formatage ──
-const MONTHS_FR = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
 const MONTHS_FR_LONG = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-
-function fmtDateShort(iso) {
-    const d = new Date(iso);
-    return `${d.getDate()} ${MONTHS_FR[d.getMonth()]}`;
-}
 
 function fmtDateLong(iso) {
     const d = new Date(iso);
@@ -18,11 +13,6 @@ function fmtDateLong(iso) {
 
 function fmtPrice(n) {
     return n.toLocaleString('fr-FR') + ' €';
-}
-
-function getQuarter(iso) {
-    const m = new Date(iso).getMonth();
-    return 'T' + (Math.floor(m / 3) + 1);
 }
 
 function getYear(iso) {
@@ -296,10 +286,7 @@ function TxCardB({ tx }) {
 
             {/* Footer - Date */}
             <div className="tx-card__footer">
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ color: 'var(--text-3)' }}>
-                    <rect x="2" y="2" width="8" height="8" rx="1" stroke="currentColor" strokeWidth="1.2" />
-                    <path d="M4 1v2M8 1v2M2 5h8" stroke="currentColor" strokeWidth="1.2" />
-                </svg>
+                <Icon name="calendar" size={12} />
                 <span>{fmtDateLong(tx.date_mutation)}</span>
             </div>
         </div>
