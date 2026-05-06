@@ -3,6 +3,7 @@ import { supabase } from './lib/supabase';
 import Nav from './components/Nav';
 import Home from './components/Home';
 import Commune from './components/pages/Commune';
+import CommuneTransactions from './components/pages/CommuneTransactions';
 import Contact from './components/pages/Contact';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
@@ -70,6 +71,7 @@ function App() {
       />
       {screen === 'home' && <Home onNavigate={handleNavigate} />}
       {screen === 'commune' && <Commune commune={screenData.commune} onNavigate={handleNavigate} />}
+      {screen === 'transactions' && <CommuneTransactions commune={screenData.commune} onNavigate={handleNavigate} />}
       {screen === 'contact' && <Contact onNavigate={handleNavigate} user={user} />}
       {screen === 'signin' && <SignIn onNavigate={handleNavigate} />}
       {screen === 'signup' && <SignUp onNavigate={handleNavigate} />}

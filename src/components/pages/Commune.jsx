@@ -36,6 +36,9 @@ function CommuneHeader({ commune, fiabilite, onNavigate }) {
 
     return (
         <div className="commune-header">
+            <button onClick={() => onNavigate('home')} className="commune-back-btn">
+                ← Retour à l'accueil
+            </button>
             <div className="commune-header__content">
 
                 {/* Left — title + meta */}
@@ -85,7 +88,7 @@ function CommuneHeader({ commune, fiabilite, onNavigate }) {
                 <div className="commune-header__actions">
                     {/* Voir transactions */}
                     <button
-                        onClick={() => console.log('Navigation vers micro (à implémenter)')}
+                        onClick={() => onNavigate('transactions', { commune })}
                         className="commune-header__btn commune-header__btn--secondary"
                     >
                         <Icon name="document" size={14} color="var(--text-2)" />
@@ -739,13 +742,6 @@ function Commune({ commune, onNavigate }) {
 
                 {/* Évolution annuelle */}
                 <EvolAnnuelle data={cityData.evolution_annuelle} />
-
-                {/* Bouton retour */}
-                <div style={{ marginTop: 40, textAlign: 'center' }}>
-                    <button onClick={() => onNavigate('home')} className="commune-back-btn">
-                        ← Retour à l'accueil
-                    </button>
-                </div>
 
             </main>
         </div>

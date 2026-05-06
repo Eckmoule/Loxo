@@ -5,6 +5,10 @@
     margin-bottom: 28px;
 }
 
+.commune-header .commune-back-btn {
+    margin-bottom: 20px;
+}
+
 .commune-header__content {
     display: flex;
     align-items: flex-start;
