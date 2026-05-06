@@ -272,6 +272,13 @@ function ComboChart({ data }) {
                             fontFamily="var(--font-sans)">{label}</text>
                     ))}
 
+                    {/* Label axe X */}
+                    <text x={iW / 2} y={iH + 40} textAnchor="middle"
+                        fontSize="11" fill="var(--text-3)"
+                        fontFamily="var(--font-sans)">
+                        Trimestre
+                    </text>
+
                     {/* Barres volume */}
                     {data.map((d, i) => {
                         const h = hOfNb(d.nb);
@@ -348,7 +355,7 @@ function ComboChart({ data }) {
                     })()}
 
                     {/* Légende */}
-                    <g transform={`translate(0, ${iH + 48})`}>
+                    <g transform={`translate(0, ${iH + 60})`}>
                         {/* Légende volume (barres) */}
                         {[
                             { label: '≥ 10 transactions', color: 'var(--positive)', x: 0 },

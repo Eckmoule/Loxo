@@ -23,6 +23,14 @@ export async function getAggregatsCommune(codeCommune) {
  * Calcule l'indicateur de fiabilité
  */
 function calculerFiabilite(agregats) {
+    if (!agregats || agregats.length === 0) {
+        return {
+            total_transactions: 0,
+            min_trimestre: 0,
+            niveau: 'limite'
+        };
+    }
+
     const totalTransactions = agregats.reduce((sum, a) => sum + a.nb_transactions, 0);
     const minTrimestre = Math.min(...agregats.map(a => a.nb_transactions));
 
@@ -223,24 +231,23 @@ export function formatCommuneData(agregats, filtre = 'tous') {
         return null;
     }
 
-    const stats12Mois = calculerStats12Mois(agregats, filtre); // Temporaire
+    // Filtrer les agrégats selon le filtre actif
+    let agregatsFiltres = agregats;
+    if (filtre === 'appartements') {
+        agregatsFiltres = agregats.filter(a => a.type_local === 'A');
+    } else if (filtre === 'maisons') {
+        agregatsFiltres = agregats.filter(a => a.type_local === 'M');
+    } else {
+        agregatsFiltres = agregats.filter(a => a.type_local === 'T');
+    }
+
+    const stats12Mois = calculerStats12Mois(agregats, filtre);
 
     return {
-        fiabilite: calculerFiabilite(agregats),
+        fiabilite: calculerFiabilite(agregatsFiltres),
         filtres_disponibles: determinerFiltresDisponibles(agregats),
         graphique_prix: prepareGraphiqueData(agregats, filtre),
-        stats_12_mois: calculerStats12Mois(agregats, filtre),
-        evolution_annuelle: calculerEvolAnnuelle(agregats, filtre),
-        // Temporaire
-        stats: stats12Mois ? {
-            mediane: stats12Mois.prix_m2.valeur,
-            volume: stats12Mois.transactions.total,
-            tendance: stats12Mois.prix_m2.evolution_pct
-        } : null,
-        priceHistory: {
-            appartement: { all: [] },
-            maison: { all: [] }
-        },
-        labels: []
+        stats_12_mois: stats12Mois,
+        evolution_annuelle: calculerEvolAnnuelle(agregats, filtre)
     };
 }
