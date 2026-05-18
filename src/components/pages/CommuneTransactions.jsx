@@ -1,4 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
+import { Helmet } from 'react-helmet-async'
+import { SEO_CONFIG } from '../../config/seo'
 import { getTransactionsCommune, getAnneesDisponibles } from '../../services/transactionsService';
 import Icon from '../common/Icon';
 import './CommuneTransactions.css';
@@ -432,67 +434,45 @@ function CommuneTransactions({ commune, onNavigate, typeFilter }) {
     }
 
     return (
-        <div className="commune-transactions">
-            <main className="commune-transactions__main">
-                {/* Header */}
-                <div className="commune-transactions__header">
-                    <div>
-                        <button onClick={() => onNavigate('commune', { commune })} className="commune-back-btn">
-                            ← Retour à {commune.nom_commune}
-                        </button>
-                        <h1 className="commune-transactions__title">{commune.nom_commune}</h1>
-                        <h2 className="commune-transactions__subtitle">
-                            Détail des transactions
-                        </h2>
-                    </div>
-                </div>
+        <>
+            <Helmet>
+                <title>{`Transactions immobilières ${commune.nom_commune} (${commune.code_postal[0]}) - Détail par bien | ${SEO_CONFIG.SITE_NAME}`}</title>
+                <meta
+                    name="description"
+                    content={`Liste complète des transactions immobilières à ${commune.nom_commune} : prix, surface, type de bien. Filtrez par période, prix, rue. Données DVF ${SEO_CONFIG.DATA_PERIOD_LABEL}.`}
+                />
+                <meta
+                    name="keywords"
+                    content={`transactions immobilières ${commune.nom_commune}, ventes immobilières ${commune.code_postal[0]}, détail transactions DVF ${commune.nom_commune}`}
+                />
 
-                {/* Layout 2 colonnes */}
-                <div className="commune-transactions__layout">
-                    <FiltersPanel
-                        filters={filters}
-                        onChange={setFilters}
-                        onReset={() => setFilters({
-                            ...DEFAULTS,
-                            prix_total: [filters.prix_total_min, filters.prix_total_max],
-                            prix_m2: [filters.prix_m2_min, filters.prix_m2_max],
-                            prix_total_min: filters.prix_total_min,
-                            prix_total_max: filters.prix_total_max,
-                            prix_m2_min: filters.prix_m2_min,
-                            prix_m2_max: filters.prix_m2_max
-                        })}
-                        count={filtered.length}
-                    />
-
-                    <div>
-                        {/* Toolbar */}
-                        <div className="commune-transactions__toolbar">
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-                                <div>
-                                    <span className="commune-transactions__count">{filtered.length}</span>
-                                    <span className="commune-transactions__count-label">
-                                        transaction{filtered.length > 1 ? 's' : ''} affichée{filtered.length > 1 ? 's' : ''}
-                                    </span>
-                                </div>
-
-                                {/* Sort */}
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                    <span className="commune-transactions__sort-label">Trier :</span>
-                                    <select value={sort} onChange={e => setSort(e.target.value)} className="commune-transactions__sort-select">
-                                        <option value="date_desc">Date (récent)</option>
-                                        <option value="date_asc">Date (ancien)</option>
-                                        <option value="prix_desc">Prix décroissant</option>
-                                        <option value="prix_asc">Prix croissant</option>
-                                        <option value="ppm2_desc">€/m² décroissant</option>
-                                        <option value="ppm2_asc">€/m² croissant</option>
-                                    </select>
-                                </div>
-                            </div>
+                {/* Open Graph */}
+                <meta property="og:title" content={`Transactions immobilières ${commune.nom_commune} - Loxo`} />
+                <meta property="og:description" content={`Liste des transactions immobilières à ${commune.nom_commune}. Données officielles DVF 2021-2025.`} />
+                <meta property="og:url" content={`https://loxo.fr/commune/${commune.code_commune}/transactions`} />
+                <meta property="og:image" content="https://loxo.fr/og-image.png" />
+            </Helmet>
+            <div className="commune-transactions">
+                <main className="commune-transactions__main">
+                    {/* Header */}
+                    <div className="commune-transactions__header">
+                        <div>
+                            <button onClick={() => onNavigate('commune', { commune })} className="commune-back-btn">
+                                ← Retour à {commune.nom_commune}
+                            </button>
+                            <h1 className="commune-transactions__title">{commune.nom_commune}</h1>
+                            <h2 className="commune-transactions__subtitle">
+                                Détail des transactions
+                            </h2>
                         </div>
+                    </div>
 
-                        {/* Cards grid */}
-                        {filtered.length === 0 ? (
-                            <EmptyState onReset={() => ssetFilters({
+                    {/* Layout 2 colonnes */}
+                    <div className="commune-transactions__layout">
+                        <FiltersPanel
+                            filters={filters}
+                            onChange={setFilters}
+                            onReset={() => setFilters({
                                 ...DEFAULTS,
                                 prix_total: [filters.prix_total_min, filters.prix_total_max],
                                 prix_m2: [filters.prix_m2_min, filters.prix_m2_max],
@@ -500,28 +480,69 @@ function CommuneTransactions({ commune, onNavigate, typeFilter }) {
                                 prix_total_max: filters.prix_total_max,
                                 prix_m2_min: filters.prix_m2_min,
                                 prix_m2_max: filters.prix_m2_max
-                            })} />
-                        ) : (
-                            <>
-                                <div className="commune-transactions__grid">
-                                    {visible.map(tx => <TxCardB key={tx.id} tx={tx} />)}
+                            })}
+                            count={filtered.length}
+                        />
+
+                        <div>
+                            {/* Toolbar */}
+                            <div className="commune-transactions__toolbar">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+                                    <div>
+                                        <span className="commune-transactions__count">{filtered.length}</span>
+                                        <span className="commune-transactions__count-label">
+                                            transaction{filtered.length > 1 ? 's' : ''} affichée{filtered.length > 1 ? 's' : ''}
+                                        </span>
+                                    </div>
+
+                                    {/* Sort */}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                        <span className="commune-transactions__sort-label">Trier :</span>
+                                        <select value={sort} onChange={e => setSort(e.target.value)} className="commune-transactions__sort-select">
+                                            <option value="date_desc">Date (récent)</option>
+                                            <option value="date_asc">Date (ancien)</option>
+                                            <option value="prix_desc">Prix décroissant</option>
+                                            <option value="prix_asc">Prix croissant</option>
+                                            <option value="ppm2_desc">€/m² décroissant</option>
+                                            <option value="ppm2_asc">€/m² croissant</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                {limit < filtered.length && (
-                                    <div className="commune-transactions__loading">
-                                        Chargement de {Math.min(20, filtered.length - limit)} transactions supplémentaires…
+                            </div>
+
+                            {/* Cards grid */}
+                            {filtered.length === 0 ? (
+                                <EmptyState onReset={() => ssetFilters({
+                                    ...DEFAULTS,
+                                    prix_total: [filters.prix_total_min, filters.prix_total_max],
+                                    prix_m2: [filters.prix_m2_min, filters.prix_m2_max],
+                                    prix_total_min: filters.prix_total_min,
+                                    prix_total_max: filters.prix_total_max,
+                                    prix_m2_min: filters.prix_m2_min,
+                                    prix_m2_max: filters.prix_m2_max
+                                })} />
+                            ) : (
+                                <>
+                                    <div className="commune-transactions__grid">
+                                        {visible.map(tx => <TxCardB key={tx.id} tx={tx} />)}
                                     </div>
-                                )}
-                                {limit >= filtered.length && filtered.length > 20 && (
-                                    <div className="commune-transactions__end">
-                                        Fin des résultats · {filtered.length} transactions
-                                    </div>
-                                )}
-                            </>
-                        )}
+                                    {limit < filtered.length && (
+                                        <div className="commune-transactions__loading">
+                                            Chargement de {Math.min(20, filtered.length - limit)} transactions supplémentaires…
+                                        </div>
+                                    )}
+                                    {limit >= filtered.length && filtered.length > 20 && (
+                                        <div className="commune-transactions__end">
+                                            Fin des résultats · {filtered.length} transactions
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
                     </div>
-                </div>
-            </main>
-        </div>
+                </main>
+            </div>
+        </>
     );
 }
 

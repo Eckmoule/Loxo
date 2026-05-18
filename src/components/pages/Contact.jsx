@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { validateEmail, validateMessageLength } from '../../utils/validation';
+import { Helmet } from 'react-helmet-async'
 import FormField from '../common/FormField';
 import Button from '../common/Button';
 import Icon from '../common/Icon';
@@ -86,100 +87,116 @@ function Contact({ onNavigate, user }) {
   }
 
   return (
-    <main className="page-layout">
-      <div className="page-layout__background" />
-      <div className="page-layout__gradient" />
+    <>
+      <Helmet>
+        <title>Contact - Loxo | Prix immobilier France</title>
+        <meta
+          name="description"
+          content="Contactez l'équipe Loxo pour toute question sur les prix immobiliers, les données DVF ou des suggestions d'amélioration."
+        />
+        <meta name="keywords" content="contact Loxo, support, aide données immobilier" />
 
-      <div className="page-layout__content page-layout__content--contact">
-        {/* Header */}
-        <div className="page-header">
-          <h1 className="page-header__title page-header__title--contact">Nous contacter</h1>
-          <p className="page-header__subtitle">
-            Une question, un problème ou une suggestion ? Nous lisons tous les messages.
-          </p>
-        </div>
+        {/* Open Graph */}
+        <meta property="og:title" content="Contact - Loxo" />
+        <meta property="og:description" content="Contactez l'équipe Loxo pour toute question sur les prix immobiliers." />
+        <meta property="og:url" content="https://loxo.fr/contact" />
+        <meta property="og:image" content="https://loxo.fr/og-image.png" />
+      </Helmet>
+      <main className="page-layout">
+        <div className="page-layout__background" />
+        <div className="page-layout__gradient" />
 
-        {/* Card */}
-        <div className="page-card">
-          <form onSubmit={handleSubmit} className="page-form page-form--contact">
+        <div className="page-layout__content page-layout__content--contact">
+          {/* Header */}
+          <div className="page-header">
+            <h1 className="page-header__title page-header__title--contact">Nous contacter</h1>
+            <p className="page-header__subtitle">
+              Une question, un problème ou une suggestion ? Nous lisons tous les messages.
+            </p>
+          </div>
 
-            {/* Email */}
-            <FormField label="Adresse e-mail" error={errors.email}>
-              <input
-                type="email"
-                value={form.email}
-                onChange={e => set('email', e.target.value)}
-                placeholder="vous@exemple.fr"
-                disabled={!!user}
-                className={`input ${errors.email ? 'input--error' : ''}`}
-                style={user ? { cursor: 'not-allowed', opacity: 0.6 } : {}}
-              />
-            </FormField>
+          {/* Card */}
+          <div className="page-card">
+            <form onSubmit={handleSubmit} className="page-form page-form--contact">
 
-            {/* Subject */}
-            <FormField label="Sujet" error={errors.subject}>
-              <div className="subject-dropdown">
-                <button
-                  type="button"
-                  onClick={() => setSubjectOpen(o => !o)}
-                  className={`input subject-dropdown__button ${!form.subject ? 'subject-dropdown__button--placeholder' : ''} ${errors.subject ? 'input--error' : ''}`}
-                >
-                  {form.subject || 'Choisir un sujet…'}
-                  <Icon
-                    name="arrowDown"
-                    size={14}
-                    className={`subject-dropdown__arrow ${subjectOpen ? 'subject-dropdown__arrow--open' : ''}`}
-                  />
-                </button>
-                {subjectOpen && (
-                  <div className="subject-dropdown__menu">
-                    {SUBJECTS.map(s => (
-                      <button
-                        key={s}
-                        type="button"
-                        onMouseDown={() => { set('subject', s); setSubjectOpen(false); }}
-                        className={`subject-dropdown__item ${form.subject === s ? 'subject-dropdown__item--selected' : ''}`}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
+              {/* Email */}
+              <FormField label="Adresse e-mail" error={errors.email}>
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={e => set('email', e.target.value)}
+                  placeholder="vous@exemple.fr"
+                  disabled={!!user}
+                  className={`input ${errors.email ? 'input--error' : ''}`}
+                  style={user ? { cursor: 'not-allowed', opacity: 0.6 } : {}}
+                />
+              </FormField>
+
+              {/* Subject */}
+              <FormField label="Sujet" error={errors.subject}>
+                <div className="subject-dropdown">
+                  <button
+                    type="button"
+                    onClick={() => setSubjectOpen(o => !o)}
+                    className={`input subject-dropdown__button ${!form.subject ? 'subject-dropdown__button--placeholder' : ''} ${errors.subject ? 'input--error' : ''}`}
+                  >
+                    {form.subject || 'Choisir un sujet…'}
+                    <Icon
+                      name="arrowDown"
+                      size={14}
+                      className={`subject-dropdown__arrow ${subjectOpen ? 'subject-dropdown__arrow--open' : ''}`}
+                    />
+                  </button>
+                  {subjectOpen && (
+                    <div className="subject-dropdown__menu">
+                      {SUBJECTS.map(s => (
+                        <button
+                          key={s}
+                          type="button"
+                          onMouseDown={() => { set('subject', s); setSubjectOpen(false); }}
+                          className={`subject-dropdown__item ${form.subject === s ? 'subject-dropdown__item--selected' : ''}`}
+                        >
+                          {s}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </FormField>
+
+              {/* Message */}
+              <FormField label="Message" error={errors.message}>
+                <textarea
+                  value={form.message}
+                  onChange={e => set('message', e.target.value)}
+                  placeholder="Décrivez votre demande…"
+                  rows={5}
+                  className={`input input--textarea ${errors.message ? 'input--error' : ''}`}
+                />
+                <div className={`message-counter ${form.message.length < 10 ? 'message-counter--short' : 'message-counter--ok'}`}>
+                  {form.message.length} / 1000
+                </div>
+              </FormField>
+
+              {/* Submit */}
+              <Button type="submit" variant="primary" loading={loading}>
+                {loading ? (
+                  <>
+                    <Icon name="spinner" />
+                    Envoi en cours…
+                  </>
+                ) : (
+                  <>
+                    <Icon name="send" size={14} color="white" />
+                    Envoyer le message
+                  </>
                 )}
-              </div>
-            </FormField>
-
-            {/* Message */}
-            <FormField label="Message" error={errors.message}>
-              <textarea
-                value={form.message}
-                onChange={e => set('message', e.target.value)}
-                placeholder="Décrivez votre demande…"
-                rows={5}
-                className={`input input--textarea ${errors.message ? 'input--error' : ''}`}
-              />
-              <div className={`message-counter ${form.message.length < 10 ? 'message-counter--short' : 'message-counter--ok'}`}>
-                {form.message.length} / 1000
-              </div>
-            </FormField>
-
-            {/* Submit */}
-            <Button type="submit" variant="primary" loading={loading}>
-              {loading ? (
-                <>
-                  <Icon name="spinner" />
-                  Envoi en cours…
-                </>
-              ) : (
-                <>
-                  <Icon name="send" size={14} color="white" />
-                  Envoyer le message
-                </>
-              )}
-            </Button>
-          </form>
+              </Button>
+            </form>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </>
   );
 }
 

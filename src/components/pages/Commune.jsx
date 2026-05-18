@@ -1,4 +1,6 @@
+import { Helmet } from 'react-helmet-async'
 import { useState, useEffect, useRef } from 'react';
+import { SEO_CONFIG } from '../../config/seo'
 import { getAggregatsCommune, formatCommuneData } from '../../services/aggregatsService';
 import Icon from '../common/Icon';
 import './Commune.css';
@@ -719,48 +721,75 @@ function Commune({ commune, onNavigate }) {
         );
     }
 
-    return (
-        <div style={{ minHeight: 'calc(100vh - 56px)', background: 'var(--bg)' }}>
-            <main style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 80px' }}>
+    console.log('🔍 DEBUG Commune:', {
+        commune_complet: commune,
+        nom: commune?.nom_commune,
+        code_postal: commune?.code_postal,
+        code_commune: commune?.code_commune
+    });
 
-                {/* Header */}
-                <CommuneHeader
-                    commune={commune}
-                    fiabilite={cityData.fiabilite}
-                    onNavigate={onNavigate}
-                    typeFilter={typeFilter}
+
+    return (
+        <>
+            <Helmet>
+                <title>{`Prix immobilier ${commune.nom_commune} (${commune.code_postal[0]}) - Évolution ${SEO_CONFIG.DATA_PERIOD_LABEL} | ${SEO_CONFIG.SITE_NAME}`}</title>
+                <meta
+                    name="description"
+                    content={`Évolution des prix immobiliers à ${commune.nom_commune} : prix médian au m², transactions, statistiques. ${SEO_CONFIG.DATA_SOURCE} ${SEO_CONFIG.DATA_PERIOD_LABEL}.`}
+                />
+                <meta
+                    name="keywords"
+                    content={`prix immobilier ${commune.nom_commune}, DVF ${commune.nom_commune}, prix m² ${commune.code_postal[0]}, marché immobilier ${commune.nom_commune}`}
                 />
 
-                {/* Graphique principal */}
-                <div className="chart-card">
-                    <div className="chart-card__header">
-                        <div className="chart-card__title-group">
-                            <svg width="15" height="15" viewBox="0 0 15 15" fill="none" className="chart-card__icon">
-                                <path d="M2 12l4-4.5 3 3 4.5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                            <h2 className="chart-card__title">
-                                Évolution prix médian / m² + volume
-                            </h2>
-                            <span className="chart-card__subtitle">DVF · Trimestriel</span>
-                            <InfoTooltip text="Ces données sont calculées sur l'ensemble des transactions trouvées sur DVF pour la période. Le volume de transactions est indiqué pour donner du contexte sur la pertinence de l'information." />
+                {/* Open Graph */}
+                <meta property="og:title" content={`Prix immobilier ${commune.nom_commune} - Loxo`} />
+                <meta property="og:description" content={`Évolution des prix immobiliers à ${commune.nom_commune}. Données officielles 2021-2025.`} />
+                <meta property="og:url" content={`https://loxo.fr/commune/${commune.code_commune}`} />
+                <meta property="og:image" content="https://loxo.fr/og-image.png" />
+            </Helmet>
+            <div style={{ minHeight: 'calc(100vh - 56px)', background: 'var(--bg)' }}>
+                <main style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 80px' }}>
+
+                    {/* Header */}
+                    <CommuneHeader
+                        commune={commune}
+                        fiabilite={cityData.fiabilite}
+                        onNavigate={onNavigate}
+                        typeFilter={typeFilter}
+                    />
+
+                    {/* Graphique principal */}
+                    <div className="chart-card">
+                        <div className="chart-card__header">
+                            <div className="chart-card__title-group">
+                                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" className="chart-card__icon">
+                                    <path d="M2 12l4-4.5 3 3 4.5-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                <h2 className="chart-card__title">
+                                    Évolution prix médian / m² + volume
+                                </h2>
+                                <span className="chart-card__subtitle">DVF · Trimestriel</span>
+                                <InfoTooltip text="Ces données sont calculées sur l'ensemble des transactions trouvées sur DVF pour la période. Le volume de transactions est indiqué pour donner du contexte sur la pertinence de l'information." />
+                            </div>
+                            <FiltresTabs
+                                filtresDisponibles={cityData.filtres_disponibles}
+                                active={typeFilter}
+                                onChange={setTypeFilter}
+                            />
                         </div>
-                        <FiltresTabs
-                            filtresDisponibles={cityData.filtres_disponibles}
-                            active={typeFilter}
-                            onChange={setTypeFilter}
-                        />
+                        <ComboChart data={cityData.graphique_prix} />
                     </div>
-                    <ComboChart data={cityData.graphique_prix} />
-                </div>
 
-                {/* Stats tiles */}
-                <StatTiles stats={cityData.stats_12_mois} />
+                    {/* Stats tiles */}
+                    <StatTiles stats={cityData.stats_12_mois} />
 
-                {/* Évolution annuelle */}
-                <EvolAnnuelle data={cityData.evolution_annuelle} />
+                    {/* Évolution annuelle */}
+                    <EvolAnnuelle data={cityData.evolution_annuelle} />
 
-            </main>
-        </div>
+                </main>
+            </div>
+        </>
     );
 }
 
