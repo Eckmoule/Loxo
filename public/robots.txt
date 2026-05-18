@@ -1,0 +1,15 @@
+# Loxo - Robots.txt
+# Dernière mise à jour : 2025-05-19
+
+User-agent: *
+Allow: /
+
+# Pages à ne pas indexer (auth & admin)
+Disallow: /signin
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /profile
+
+# Sitemap
+Sitemap: https://loxo.fr/sitemap.xml

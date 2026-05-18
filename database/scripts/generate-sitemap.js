@@ -1,17 +1,6 @@
-#!/usr/bin/env node
-
-/**
- * Script de génération des sitemaps Loxo
- * 
- * Génère :
- * - sitemap.xml (index principal)
- * - sitemap-main.xml (pages statiques)
- * - sitemap-[dept].xml (un par département, ex: sitemap-69.xml)
- * 
- * Usage : node scripts/generate-sitemap.js
- * 
- * À exécuter après chaque import DVF (semestriel)
- */
+// Scripts pour générer l'ensemble des sitemap pour toute les communes pour le referencement.
+// Génere un sitemap par département (2A & 2B pour Corse & 97 pour l'ensemble des communes des DOM-TOM)
+// A lancer via node generate-sitemap.js
 
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
