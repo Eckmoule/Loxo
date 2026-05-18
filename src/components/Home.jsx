@@ -1,14 +1,17 @@
+import { useNavigate } from 'react-router-dom';
 import SearchBar from './common/SearchBar';
-import { Helmet } from 'react-helmet-async'
-import { SEO_CONFIG } from '../config/seo'
+import { Helmet } from 'react-helmet-async';
+import { SEO_CONFIG } from '../config/seo';
 import './Home.css';
 
 const TAGS = ['Données officielles', 'Gratuit', 'Sans estimation', 'Source traçable'];
 
-function Home({ onNavigate }) {
+function Home() {
+  const navigate = useNavigate();
+
   const handleSearch = (selectedCommune) => {
-    // Navigation vers la page commune avec les données
-    onNavigate('commune', { commune: selectedCommune });
+    // Navigation vers la page commune avec le code INSEE
+    navigate(`/commune/${selectedCommune.code_commune}`);
   };
 
   return (

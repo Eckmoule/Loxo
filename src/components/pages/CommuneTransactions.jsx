@@ -1,7 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async'
 import { SEO_CONFIG } from '../../config/seo'
 import { getTransactionsCommune, getAnneesDisponibles } from '../../services/transactionsService';
+import { getCommuneByCode } from '../../services/communeService';
+import { supabase } from '../../lib/supabase';
 import Icon from '../common/Icon';
 import './CommuneTransactions.css';
 
@@ -317,13 +320,22 @@ function EmptyState({ onReset }) {
 }
 
 // ── Composant principal ──
-function CommuneTransactions({ commune, onNavigate, typeFilter }) {
+function CommuneTransactions() {
+    const { codeCommune } = useParams();
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // Récupérer typeFilter depuis location state (passé par Commune.jsx)
+    const initialTypeFilter = location.state?.typeFilter || 'tous';
+
+    const [commune, setCommune] = useState(null);
+
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [filters, setFilters] = useState(() => ({
+    const [filters, setFilters] = useState({
         ...DEFAULTS,
-        type: typeFilter || 'tous'
-    }));
+        type: initialTypeFilter,
+    });
     const [sort, setSort] = useState('date_desc');
     const [limit, setLimit] = useState(20);
     const [cachedYears, setCachedYears] = useState([]);
@@ -365,6 +377,17 @@ function CommuneTransactions({ commune, onNavigate, typeFilter }) {
 
         loadInitialTransactions();
     }, [commune]);
+
+    // Charger la commune depuis Supabase ------------- A REVOIR ----------------
+    useEffect(() => {
+        async function loadCommune() {
+            const data = await getCommuneByCode(codeCommune);
+            setCommune(data);
+            if (!data) setLoading(false);
+        }
+
+        loadCommune();
+    }, [codeCommune]);
 
     // Recharger les transactions quand les années sélectionnées changent
     useEffect(() => {
@@ -415,7 +438,7 @@ function CommuneTransactions({ commune, onNavigate, typeFilter }) {
             <div className="commune-transactions">
                 <div className="commune-error">
                     <h2>Commune introuvable</h2>
-                    <button onClick={() => onNavigate('home')} className="commune-back-btn">
+                    <button onClick={() => navigate('/')} className="commune-back-btn">
                         Retour à l'accueil
                     </button>
                 </div>
@@ -457,7 +480,7 @@ function CommuneTransactions({ commune, onNavigate, typeFilter }) {
                     {/* Header */}
                     <div className="commune-transactions__header">
                         <div>
-                            <button onClick={() => onNavigate('commune', { commune })} className="commune-back-btn">
+                            <button onClick={() => navigate(`/commune/${codeCommune}`)} className="commune-back-btn">
                                 ← Retour à {commune.nom_commune}
                             </button>
                             <h1 className="commune-transactions__title">{commune.nom_commune}</h1>
@@ -512,7 +535,7 @@ function CommuneTransactions({ commune, onNavigate, typeFilter }) {
 
                             {/* Cards grid */}
                             {filtered.length === 0 ? (
-                                <EmptyState onReset={() => ssetFilters({
+                                <EmptyState onReset={() => setFilters({
                                     ...DEFAULTS,
                                     prix_total: [filters.prix_total_min, filters.prix_total_max],
                                     prix_m2: [filters.prix_m2_min, filters.prix_m2_max],

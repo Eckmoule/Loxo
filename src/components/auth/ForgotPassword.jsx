@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 import { validateEmail } from '../../utils/validation';
 import FormField from '../common/FormField';
 import Button from '../common/Button';
@@ -8,7 +9,8 @@ import StatusMessage from '../common/StatusMessage';
 import '../common/Input.css';
 import './Auth.css';
 
-function ForgotPassword({ onNavigate }) {
+function ForgotPassword() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -46,7 +48,7 @@ function ForgotPassword({ onNavigate }) {
         title="E-mail envoyé !"
         message="Vérifiez votre boîte mail. Nous vous avons envoyé un lien pour réinitialiser votre mot de passe."
         buttonText="Retour à la connexion"
-        onButtonClick={() => onNavigate('signin')}
+        onButtonClick={() => navigate('/signin')}
       />
     );
   }
@@ -101,7 +103,7 @@ function ForgotPassword({ onNavigate }) {
         {/* Footer */}
         <p className="page-footer">
           Vous vous souvenez ?{' '}
-          <button onClick={() => onNavigate('signin')} className="auth-form__link">
+          <button onClick={() => navigate('/signin')} className="auth-form__link">
             Se connecter
           </button>
         </p>

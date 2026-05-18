@@ -1,7 +1,10 @@
 import { Helmet } from 'react-helmet-async'
 import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { supabase } from '../../lib/supabase';
 import { SEO_CONFIG } from '../../config/seo'
 import { getAggregatsCommune, formatCommuneData } from '../../services/aggregatsService';
+import { getCommuneByCode } from '../../services/communeService';
 import Icon from '../common/Icon';
 import './Commune.css';
 import './CommuneHeader.css';
@@ -32,13 +35,13 @@ const FIABILITE_CONFIG = {
 };
 
 // ── Composant Header ──
-function CommuneHeader({ commune, fiabilite, onNavigate, typeFilter }) {
+function CommuneHeader({ commune, fiabilite, navigate, typeFilter }) {
     const [alertSent, setAlertSent] = useState(false);
     const f = FIABILITE_CONFIG[fiabilite.niveau];
 
     return (
         <div className="commune-header">
-            <button onClick={() => onNavigate('home')} className="commune-back-btn">
+            <button onClick={() => navigate('/')} className="commune-back-btn">
                 ← Retour à l'accueil
             </button>
             <div className="commune-header__content">
@@ -104,7 +107,7 @@ function CommuneHeader({ commune, fiabilite, onNavigate, typeFilter }) {
                         </div>
                     ) : (
                         <button
-                            onClick={() => onNavigate('transactions', { commune, typeFilter })}
+                            onClick={() => navigate(`/commune/${commune.code_commune}/transactions`, { state: { typeFilter } })}
                             className="commune-header__btn commune-header__btn--secondary"
                         >
                             <Icon name="document" size={14} />
@@ -654,17 +657,32 @@ function EvolAnnuelle({ data }) {
 }
 
 // ── Composant principal ──
-function Commune({ commune, onNavigate }) {
+function Commune() {
+    const { codeCommune } = useParams();
+    const navigate = useNavigate();
+
+    const [commune, setCommune] = useState(null);
     const [cityData, setCityData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [typeFilter, setTypeFilter] = useState('tous');
 
-    // Charger les données
+    // Charger la commune depuis Supabase
+    useEffect(() => {
+        async function loadCommune() {
+            setLoading(true);
+            const data = await getCommuneByCode(codeCommune);
+            setCommune(data);
+            setLoading(false);
+        }
+
+        loadCommune();
+    }, [codeCommune]);
+
+    // Charger les données agregats
     useEffect(() => {
         async function loadData() {
             if (!commune) return;
 
-            setLoading(true);
             const agregats = await getAggregatsCommune(commune.code_commune);
             const formatted = formatCommuneData(agregats, typeFilter);
             setCityData(formatted);
@@ -678,26 +696,14 @@ function Commune({ commune, onNavigate }) {
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape' || e.key === 'Backspace') {
-                onNavigate('home');
+                navigate('/');
             }
         };
         document.addEventListener('keydown', handleKeyDown);
         return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [onNavigate]);
+    }, [navigate]);
 
-    if (!commune) {
-        return (
-            <main className="commune-page">
-                <div className="commune-error">
-                    <h2>Commune introuvable</h2>
-                    <button onClick={() => onNavigate('home')} className="commune-back-btn">
-                        Retour à l'accueil
-                    </button>
-                </div>
-            </main>
-        );
-    }
-
+    // États de chargement/erreur
     if (loading) {
         return (
             <main className="commune-page">
@@ -708,12 +714,12 @@ function Commune({ commune, onNavigate }) {
         );
     }
 
-    if (!cityData || !cityData.graphique_prix) {
+    if (!commune) {
         return (
             <main className="commune-page">
                 <div className="commune-error">
-                    <h2>Aucune donnée disponible pour cette commune</h2>
-                    <button onClick={() => onNavigate('home')} className="commune-back-btn">
+                    <h2>Commune introuvable</h2>
+                    <button onClick={() => navigate('/')} className="commune-back-btn">
                         Retour à l'accueil
                     </button>
                 </div>
@@ -721,13 +727,18 @@ function Commune({ commune, onNavigate }) {
         );
     }
 
-    console.log('🔍 DEBUG Commune:', {
-        commune_complet: commune,
-        nom: commune?.nom_commune,
-        code_postal: commune?.code_postal,
-        code_commune: commune?.code_commune
-    });
-
+    if (!cityData || !cityData.graphique_prix) {
+        return (
+            <main className="commune-page">
+                <div className="commune-error">
+                    <h2>Aucune donnée disponible pour cette commune</h2>
+                    <button onClick={() => navigate('/')} className="commune-back-btn">
+                        Retour à l'accueil
+                    </button>
+                </div>
+            </main>
+        );
+    }
 
     return (
         <>
@@ -755,7 +766,7 @@ function Commune({ commune, onNavigate }) {
                     <CommuneHeader
                         commune={commune}
                         fiabilite={cityData.fiabilite}
-                        onNavigate={onNavigate}
+                        navigate={navigate}
                         typeFilter={typeFilter}
                     />
 

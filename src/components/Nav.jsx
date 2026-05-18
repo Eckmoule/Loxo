@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Icon from './common/Icon';
 import './Nav.css';
 
-function Nav({ theme, onToggleTheme, screen, city, onNavigate, user, onSignOut }) {
+function Nav({ theme, onToggleTheme, user, onSignOut }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Close menu on outside click
   useEffect(() => {
@@ -17,40 +20,39 @@ function Nav({ theme, onToggleTheme, screen, city, onNavigate, user, onSignOut }
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const breadcrumb = () => {
-    if (screen === 'home' || screen === 'signin' || screen === 'contact') return null;
+  // Déterminer la page actuelle depuis l'URL
+  const isHome = location.pathname === '/';
+  const isCommune = location.pathname.startsWith('/commune/');
+  const isContact = location.pathname === '/contact';
 
-    return (
-      <div className="nav__breadcrumb">
-        <button onClick={() => onNavigate('home')} className="nav__breadcrumb-link">
-          Accueil
-        </button>
-        {city && (
-          <>
-            <span className="nav__breadcrumb-separator">/</span>
-            <button
-              onClick={() => onNavigate('macro', { city })}
-              className={`nav__breadcrumb-link ${screen === 'macro' ? 'nav__breadcrumb-link--active' : ''}`}
-            >
-              {city.name}
-            </button>
-          </>
-        )}
-        {screen === 'micro' && (
-          <>
-            <span className="nav__breadcrumb-separator">/</span>
-            <span className="nav__breadcrumb-link nav__breadcrumb-link--active">Carte</span>
-          </>
-        )}
-      </div>
-    );
+  const breadcrumb = () => {
+    // Pas de breadcrumb sur home, contact, signin
+    if (isHome || isContact || location.pathname === '/signin') return null;
+
+    // Si on est sur une page commune, on pourrait afficher un breadcrumb
+    // Pour l'instant on le laisse simple
+    if (isCommune) {
+      return (
+        <div className="nav__breadcrumb">
+          <button onClick={() => navigate('/')} className="nav__breadcrumb-link">
+            Accueil
+          </button>
+          {/* Optionnel : ajouter le nom de la commune ici si nécessaire */}
+        </div>
+      );
+    }
+
+    return null;
   };
 
   const menuItems = [
     {
       label: 'Nous contacter',
       icon: <Icon name="mail" size={14} />,
-      action: () => { onNavigate('contact'); setMenuOpen(false); }
+      action: () => {
+        navigate('/contact');
+        setMenuOpen(false);
+      }
     },
     {
       label: 'À propos',
@@ -68,7 +70,7 @@ function Nav({ theme, onToggleTheme, screen, city, onNavigate, user, onSignOut }
     <header className="nav">
       <div className="nav__container">
         {/* Logo */}
-        <button onClick={() => onNavigate('home')} className="nav__logo">
+        <button onClick={() => navigate('/')} className="nav__logo">
           <Icon name="logo" size={22} />
           Loxo
         </button>
@@ -117,7 +119,7 @@ function Nav({ theme, onToggleTheme, screen, city, onNavigate, user, onSignOut }
               Déconnexion
             </button>
           ) : (
-            <button onClick={() => onNavigate('signin')} className="nav__signin-button">
+            <button onClick={() => navigate('/signin')} className="nav__signin-button">
               <Icon name="user" size={14} color="white" />
               Se connecter
             </button>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 import { validateForm } from '../../utils/validation';
 import PasswordInput from '../common/PasswordInput';
 import Button from '../common/Button';
@@ -8,7 +9,8 @@ import StatusMessage from '../common/StatusMessage';
 import '../common/Input.css';
 import './Auth.css';
 
-function ResetPassword({ onNavigate }) {
+function ResetPassword() {
+  const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -64,7 +66,7 @@ function ResetPassword({ onNavigate }) {
         title="Mot de passe réinitialisé !"
         message="Votre mot de passe a été mis à jour avec succès."
         buttonText="Accéder à mon compte"
-        onButtonClick={() => onNavigate('home')}
+        onButtonClick={() => navigate('/')}
       />
     );
   }
@@ -76,7 +78,7 @@ function ResetPassword({ onNavigate }) {
         title="Lien invalide"
         message={error}
         buttonText="Demander un nouveau lien"
-        onButtonClick={() => onNavigate('forgot-password')}
+        onButtonClick={() => navigate('/forgot-password')}
       />
     );
   }

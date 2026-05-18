@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 import { validateForm } from '../../utils/validation';
 import FormField from '../common/FormField';
 import PasswordInput from '../common/PasswordInput';
@@ -9,7 +10,8 @@ import StatusMessage from '../common/StatusMessage';
 import '../common/Input.css';
 import './Auth.css';
 
-function SignUp({ onNavigate }) {
+function SignUp() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -55,7 +57,7 @@ function SignUp({ onNavigate }) {
         title="Compte créé !"
         message="Vérifiez votre boîte mail pour confirmer votre adresse e-mail."
         buttonText="Se connecter"
-        onButtonClick={() => onNavigate('signin')}
+        onButtonClick={() => navigate('/signin')}
       />
     );
   }
@@ -131,7 +133,7 @@ function SignUp({ onNavigate }) {
         {/* Footer */}
         <p className="page-footer">
           Déjà un compte ?{' '}
-          <button onClick={() => onNavigate('signin')} className="auth-form__link">
+          <button onClick={() => navigate('/signin')} className="auth-form__link">
             Se connecter
           </button>
         </p>

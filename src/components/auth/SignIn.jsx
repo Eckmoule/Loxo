@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
+import { useNavigate } from 'react-router-dom';
 import FormField from '../common/FormField';
 import PasswordInput from '../common/PasswordInput';
 import Button from '../common/Button';
@@ -7,7 +8,8 @@ import Icon from '../common/Icon';
 import '../common/Input.css';
 import './Auth.css';
 
-function SignIn({ onNavigate }) {
+function SignIn() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,7 +36,7 @@ function SignIn({ onNavigate }) {
     if (error) {
       setError(error.message);
     } else {
-      onNavigate('home');
+      navigate('/');
     }
   };
 
@@ -80,7 +82,7 @@ function SignIn({ onNavigate }) {
               value={password}
               onChange={e => setPassword(e.target.value)}
               showForgotLink={true}
-              onForgotClick={() => onNavigate('forgot-password')}
+              onForgotClick={() => navigate('/forgot-password')}
             />
 
             {/* Error */}
@@ -101,7 +103,7 @@ function SignIn({ onNavigate }) {
         {/* Footer */}
         <p className="page-footer">
           Pas encore de compte ?{' '}
-          <button onClick={() => onNavigate('signup')} className="auth-form__link">
+          <button onClick={() => navigate('/signup')} className="auth-form__link">
             Créer un compte
           </button>
         </p>

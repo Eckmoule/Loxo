@@ -1,3 +1,4 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
 import Nav from './components/Nav';
@@ -12,21 +13,16 @@ import ResetPassword from './components/auth/ResetPassword';
 import './App.css';
 
 function App() {
-  const [screen, setScreen] = useState('home');
-  const [screenData, setScreenData] = useState({});
   const [theme, setTheme] = useState('dark');
   const [user, setUser] = useState(null);
 
+  // Theme
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+  // Auth
   useEffect(() => {
-    // Détecter si on arrive sur un lien de reset password
-    if (window.location.hash.includes('type=recovery')) {
-      setScreen('reset-password');
-    }
-
     // Récupérer la session actuelle
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -46,38 +42,42 @@ function App() {
     setTheme(t => t === 'light' ? 'dark' : 'light');
   };
 
-  const handleNavigate = (to, data = {}) => {
-    setScreen(to);
-    setScreenData(data);
-    window.scrollTo({ top: 0 });
-  };
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
-    setScreen('home');
-    setScreenData({});
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-1)' }}>
-      <Nav
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
-        screen={screen}
-        city={screenData.commune}
-        onNavigate={handleNavigate}
-        user={user}
-        onSignOut={handleSignOut}
-      />
-      {screen === 'home' && <Home onNavigate={handleNavigate} />}
-      {screen === 'commune' && <Commune commune={screenData.commune} onNavigate={handleNavigate} />}
-      {screen === 'transactions' && <CommuneTransactions commune={screenData.commune} typeFilter={screenData.typeFilter} onNavigate={handleNavigate} />}
-      {screen === 'contact' && <Contact onNavigate={handleNavigate} user={user} />}
-      {screen === 'signin' && <SignIn onNavigate={handleNavigate} />}
-      {screen === 'signup' && <SignUp onNavigate={handleNavigate} />}
-      {screen === 'forgot-password' && <ForgotPassword onNavigate={handleNavigate} />}
-      {screen === 'reset-password' && <ResetPassword onNavigate={handleNavigate} />}
-    </div>
+    <BrowserRouter>
+      <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-1)' }}>
+        <Nav
+          theme={theme}
+          onToggleTheme={handleToggleTheme}
+          user={user}
+          onSignOut={handleSignOut}
+        />
+
+        <Routes>
+          {/* Home */}
+          <Route path="/" element={<Home />} />
+
+          {/* Communes */}
+          <Route path="/commune/:codeCommune" element={<Commune />} />
+          <Route path="/commune/:codeCommune/transactions" element={<CommuneTransactions />} />
+
+          {/* Pages statiques */}
+          <Route path="/contact" element={<Contact user={user} />} />
+
+          {/* Auth */}
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+
+          {/* 404 - Redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
   );
 }
 

@@ -53,3 +53,23 @@ export async function searchCommunes(query) {
         return [];
     }
 }
+
+/**
+ * Charge une commune depuis Supabase par son code INSEE
+ * @param {string} codeCommune - Code INSEE de la commune (ex: "69386")
+ * @returns {Promise<Object|null>} - Objet commune ou null si introuvable
+ */
+export async function getCommuneByCode(codeCommune) {
+    const { data, error } = await supabase
+        .from('communes')
+        .select('*')
+        .eq('code_commune', codeCommune)
+        .single();
+
+    if (error) {
+        console.error('Erreur chargement commune:', error);
+        return null;
+    }
+
+    return data;
+}

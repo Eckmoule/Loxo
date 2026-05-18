@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { validateEmail, validateMessageLength } from '../../utils/validation';
 import { Helmet } from 'react-helmet-async'
@@ -18,7 +19,8 @@ const SUBJECTS = [
   'Autre',
 ];
 
-function Contact({ onNavigate, user }) {
+function Contact({ user }) {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     email: user?.email || '',
     subject: '',
@@ -81,7 +83,7 @@ function Contact({ onNavigate, user }) {
         title="Message envoyé !"
         message="Nous avons bien reçu votre message et vous répondrons dans les meilleurs délais."
         buttonText="Retour à l'accueil"
-        onButtonClick={() => onNavigate('home')}
+        onButtonClick={() => navigate('/')}
       />
     );
   }
