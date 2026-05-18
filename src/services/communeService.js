@@ -41,7 +41,7 @@ export async function searchCommunes(query) {
                 .select('code_commune, nom_commune, code_postal')
                 .ilike('nom_commune', `%${query}%`)
                 .order('population', { ascending: false, nullsFirst: false }) // Trier par population décroissante
-                .limit(5);
+                .limit(7);
 
             if (error) throw error;
 
