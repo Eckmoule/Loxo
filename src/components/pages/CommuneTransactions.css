@@ -369,3 +369,129 @@
     color: var(--text-3);
     font-family: var(--font-mono);
 }
+
+.filters-toggle {
+    display: none;
+    /* Caché par défaut */
+}
+
+@media (max-width: 768px) {
+    .filters-toggle {
+        display: flex;
+        /* Visible sur mobile */
+    }
+}
+
+/* ========================================
+   MOBILE RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+
+    /* Layout : passer en colonne */
+    .commune-transactions__layout {
+        display: flex;
+        /* ← AJOUTER : passer de grid à flex */
+        flex-direction: column;
+        gap: 0;
+    }
+
+    /* Le reste du code mobile reste identique */
+    .filters-panel {
+        position: static;
+        width: 100%;
+        max-height: none;
+        border-radius: 8px;
+        margin-bottom: 16px;
+    }
+
+    /* Bouton toggle filtres (à ajouter en JS) */
+    .filters-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        padding: 12px 16px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-1);
+    }
+
+    /* Contenu filtres : hidden par défaut sur mobile */
+    .filters-panel__content {
+        display: none;
+    }
+
+    .filters-panel--open .filters-panel__content {
+        display: block;
+    }
+
+    /* Cartes transactions : 1 colonne */
+    .commune-transactions__grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* Carte transaction : plus compacte */
+    .tx-card {
+        padding: 14px;
+    }
+
+    .tx-card__price {
+        font-size: 18px;
+    }
+
+    .tx-card__ppm2 {
+        font-size: 13px;
+    }
+
+    /* Toolbar : wrap sur mobile */
+    .commune-transactions__toolbar {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .commune-transactions__sort-select {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   TABLETTE (entre 463px et 768px)
+   ======================================== */
+
+@media (min-width: 464px) and (max-width: 768px) {
+
+    /* Filtres : largeur max pour éviter qu'ils débordent */
+    .filters-panel {
+        max-width: 100%;
+    }
+
+    /* Grid transactions : forcer 2 colonnes sur tablette */
+    .commune-transactions__grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+    }
+
+    /* S'assurer que les deux sections ont la même largeur */
+    .commune-transactions__layout>div {
+        width: 100%;
+    }
+}
+
+/* ========================================
+   MOBILE ÉTROIT (< 463px)
+   ======================================== */
+
+@media (max-width: 463px) {
+
+    /* Grid transactions : 1 seule colonne sur petit écran */
+    .commune-transactions__grid {
+        grid-template-columns: 1fr;
+    }
+}

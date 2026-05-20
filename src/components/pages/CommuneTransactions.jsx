@@ -339,6 +339,7 @@ function CommuneTransactions() {
     const [sort, setSort] = useState('date_desc');
     const [limit, setLimit] = useState(20);
     const [cachedYears, setCachedYears] = useState([]);
+    const [filtersOpen, setFiltersOpen] = useState(false);
 
     // Charger les transactions
     useEffect(() => {
@@ -492,21 +493,32 @@ function CommuneTransactions() {
 
                     {/* Layout 2 colonnes */}
                     <div className="commune-transactions__layout">
-                        <FiltersPanel
-                            filters={filters}
-                            onChange={setFilters}
-                            onReset={() => setFilters({
-                                ...DEFAULTS,
-                                prix_total: [filters.prix_total_min, filters.prix_total_max],
-                                prix_m2: [filters.prix_m2_min, filters.prix_m2_max],
-                                prix_total_min: filters.prix_total_min,
-                                prix_total_max: filters.prix_total_max,
-                                prix_m2_min: filters.prix_m2_min,
-                                prix_m2_max: filters.prix_m2_max
-                            })}
-                            count={filtered.length}
-                        />
-
+                        <button
+                            className="filters-toggle"
+                            onClick={() => setFiltersOpen(!filtersOpen)}
+                        >
+                            <span>
+                                🔽 Filtres
+                                {filters.annees.length > 0 && ` (${filters.annees.length} années)`}
+                            </span>
+                            <span>{filtersOpen ? '✕' : '▼'}</span>
+                        </button>
+                        <div className={`filters-panel ${filtersOpen ? 'filters-panel--open' : ''}`}>
+                            <FiltersPanel
+                                filters={filters}
+                                onChange={setFilters}
+                                onReset={() => setFilters({
+                                    ...DEFAULTS,
+                                    prix_total: [filters.prix_total_min, filters.prix_total_max],
+                                    prix_m2: [filters.prix_m2_min, filters.prix_m2_max],
+                                    prix_total_min: filters.prix_total_min,
+                                    prix_total_max: filters.prix_total_max,
+                                    prix_m2_min: filters.prix_m2_min,
+                                    prix_m2_max: filters.prix_m2_max
+                                })}
+                                count={filtered.length}
+                            />
+                        </div>
                         <div>
                             {/* Toolbar */}
                             <div className="commune-transactions__toolbar">
