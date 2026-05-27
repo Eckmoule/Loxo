@@ -128,7 +128,7 @@ function CommuneHeader({ commune, fiabilite, navigate, typeFilter }) {
                         ) : (
                             <>
                                 <Icon name="bell" size={13} color="white" />
-                                Être alerté des nouveaux prix
+                                Suivre
                             </>
                         )}
                     </button>

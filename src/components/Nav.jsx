@@ -55,14 +55,12 @@ function Nav({ theme, onToggleTheme, user, onSignOut }) {
       }
     },
     {
-      label: 'À propos',
-      icon: <Icon name="info" size={14} />,
-      action: () => setMenuOpen(false)
-    },
-    {
-      label: 'Documentation DVF',
+      label: 'Sources des données',
       icon: <Icon name="document" size={14} />,
-      action: () => setMenuOpen(false)
+      action: () => {
+        window.open('https://app.dvf.etalab.gouv.fr/', '_blank');
+        setMenuOpen(false);
+      }
     },
   ];
 
