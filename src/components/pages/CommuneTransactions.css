@@ -160,6 +160,7 @@
     font-size: 12px;
     color: var(--text-3);
     font-family: var(--font-mono);
+    white-space: nowrap;
 }
 
 .commune-transactions__sort-select {
@@ -401,7 +402,6 @@
     /* Layout : passer en colonne */
     .commune-transactions__layout {
         display: flex;
-        /* ← AJOUTER : passer de grid à flex */
         flex-direction: column;
         gap: 0;
     }
@@ -443,6 +443,19 @@
 
     .commune-transactions__sort-select {
         width: 100%;
+    }
+
+    .filters-panel__count {
+        margin-top: 8px;
+    }
+
+    .commune-transactions__toolbar>div {
+        width: 100%;
+    }
+
+    /* Ligne trier : ne pas couper */
+    .commune-transactions__toolbar div[style] {
+        flex-wrap: nowrap !important;
     }
 }
 
