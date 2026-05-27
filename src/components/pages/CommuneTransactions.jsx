@@ -480,30 +480,53 @@ function CommuneTransactions() {
                 <main className="commune-transactions__main">
                     {/* Header */}
                     <div className="commune-transactions__header">
-                        <div>
+                        <div className="commune-transactions__header-top">
+                            <h1 className="commune-transactions__title">{commune.nom_commune}</h1>
                             <button onClick={() => navigate(`/commune/${codeCommune}`)} className="commune-back-btn">
                                 ← Retour à {commune.nom_commune}
                             </button>
-                            <h1 className="commune-transactions__title">{commune.nom_commune}</h1>
-                            <h2 className="commune-transactions__subtitle">
-                                Détail des transactions
-                            </h2>
                         </div>
+                        <h2 className="commune-transactions__subtitle">
+                            Détail des transactions
+                        </h2>
                     </div>
-
                     {/* Layout 2 colonnes */}
                     <div className="commune-transactions__layout">
-                        <button
-                            className="filters-toggle"
-                            onClick={() => setFiltersOpen(!filtersOpen)}
-                        >
-                            <span>
-                                🔽 Filtres
-                                {filters.annees.length > 0 && ` (${filters.annees.length} années)`}
-                            </span>
-                            <span>{filtersOpen ? '✕' : '▼'}</span>
-                        </button>
                         <div className={`filters-panel ${filtersOpen ? 'filters-panel--open' : ''}`}>
+                            {/* Header cliquable sur mobile */}
+                            <div
+                                className="filters-panel__toggle-header"
+                                onClick={() => setFiltersOpen(!filtersOpen)}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                                        <path d="M2 3h10M3.5 7h7M5 11h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                                    </svg>
+                                    <span className="filters-panel__title">
+                                        Filtres
+                                        {filters.annees.length > 0 && ` (${filters.annees.length} années)`}
+                                    </span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <button onClick={(e) => {
+                                        e.stopPropagation(); setFilters({
+                                            ...DEFAULTS,
+                                            prix_total: [filters.prix_total_min, filters.prix_total_max],
+                                            prix_m2: [filters.prix_m2_min, filters.prix_m2_max],
+                                            prix_total_min: filters.prix_total_min,
+                                            prix_total_max: filters.prix_total_max,
+                                            prix_m2_min: filters.prix_m2_min,
+                                            prix_m2_max: filters.prix_m2_max
+                                        });
+                                    }} className="filters-panel__reset">
+                                        Réinitialiser
+                                    </button>
+                                    <span className="filters-panel__chevron">
+                                        {filtersOpen ? '▲' : '▼'}
+                                    </span>
+                                </div>
+                            </div>
+
                             <FiltersPanel
                                 filters={filters}
                                 onChange={setFilters}

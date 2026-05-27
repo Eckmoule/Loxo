@@ -41,9 +41,6 @@ function CommuneHeader({ commune, fiabilite, navigate, typeFilter }) {
 
     return (
         <div className="commune-header">
-            <button onClick={() => navigate('/')} className="commune-back-btn">
-                ← Retour à l'accueil
-            </button>
             <div className="commune-header__content">
 
                 {/* Left — title + meta */}
@@ -798,6 +795,9 @@ function Commune() {
                     {/* Évolution annuelle */}
                     <EvolAnnuelle data={cityData.evolution_annuelle} />
 
+                    <button onClick={() => navigate('/')} className="commune-back-btn commune-back-btn--bottom">
+                        ← Retour à l'accueil
+                    </button>
                 </main>
             </div>
         </>

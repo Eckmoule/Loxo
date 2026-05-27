@@ -42,6 +42,11 @@
     border-color: var(--border);
 }
 
+.commune-back-btn--bottom {
+    display: block;
+    margin: 10px auto 0;
+}
+
 /* Info tooltip */
 .info-tooltip {
     position: relative;
