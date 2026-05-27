@@ -447,6 +447,22 @@ function CommuneTransactions() {
         );
     }
 
+    const handleReset = () => {
+        const sortedYears = [...filters.anneesDisponibles].sort((a, b) => b - a);
+        const defaultYears = sortedYears.slice(0, 2); // ← 2 dernières années
+        setFilters({
+            ...DEFAULTS,
+            prix_total: [filters.prix_total_min, filters.prix_total_max],
+            prix_m2: [filters.prix_m2_min, filters.prix_m2_max],
+            prix_total_min: filters.prix_total_min,
+            prix_total_max: filters.prix_total_max,
+            prix_m2_min: filters.prix_m2_min,
+            prix_m2_max: filters.prix_m2_max,
+            anneesDisponibles: filters.anneesDisponibles,
+            annees: defaultYears,
+        });
+    };
+
     if (loading) {
         return (
             <div className="commune-transactions">
@@ -530,15 +546,7 @@ function CommuneTransactions() {
                             <FiltersPanel
                                 filters={filters}
                                 onChange={setFilters}
-                                onReset={() => setFilters({
-                                    ...DEFAULTS,
-                                    prix_total: [filters.prix_total_min, filters.prix_total_max],
-                                    prix_m2: [filters.prix_m2_min, filters.prix_m2_max],
-                                    prix_total_min: filters.prix_total_min,
-                                    prix_total_max: filters.prix_total_max,
-                                    prix_m2_min: filters.prix_m2_min,
-                                    prix_m2_max: filters.prix_m2_max
-                                })}
+                                onReset={handleReset}
                                 count={filtered.length}
                             />
                         </div>
@@ -570,15 +578,7 @@ function CommuneTransactions() {
 
                             {/* Cards grid */}
                             {filtered.length === 0 ? (
-                                <EmptyState onReset={() => setFilters({
-                                    ...DEFAULTS,
-                                    prix_total: [filters.prix_total_min, filters.prix_total_max],
-                                    prix_m2: [filters.prix_m2_min, filters.prix_m2_max],
-                                    prix_total_min: filters.prix_total_min,
-                                    prix_total_max: filters.prix_total_max,
-                                    prix_m2_min: filters.prix_m2_min,
-                                    prix_m2_max: filters.prix_m2_max
-                                })} />
+                                <EmptyState onReset={handleReset} />
                             ) : (
                                 <>
                                     <div className="commune-transactions__grid">
