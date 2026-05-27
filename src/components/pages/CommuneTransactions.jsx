@@ -4,7 +4,8 @@ import { Helmet } from 'react-helmet-async'
 import { SEO_CONFIG } from '../../config/seo'
 import { getTransactionsCommune, getAnneesDisponibles } from '../../services/transactionsService';
 import { getCommuneByCode } from '../../services/communeService';
-import { supabase } from '../../lib/supabase';
+import LoadingSpinner from '../common/LoadingSpinner';
+import ErrorState from '../common/ErrorState';
 import Icon from '../common/Icon';
 import './CommuneTransactions.css';
 
@@ -435,16 +436,10 @@ function CommuneTransactions() {
     }, [filtered.length]);
 
     if (!commune) {
-        return (
-            <div className="commune-transactions">
-                <div className="commune-error">
-                    <h2>Commune introuvable</h2>
-                    <button onClick={() => navigate('/')} className="commune-back-btn">
-                        Retour à l'accueil
-                    </button>
-                </div>
-            </div>
-        );
+        return <ErrorState
+            title="Commune introuvable"
+            message="Cette commune n'existe pas ou n'est pas encore disponible."
+        />;
     }
 
     const handleReset = () => {
@@ -464,13 +459,7 @@ function CommuneTransactions() {
     };
 
     if (loading) {
-        return (
-            <div className="commune-transactions">
-                <div className="commune-error">
-                    <h2>Chargement des transactions...</h2>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner message="Chargement des transactions..." />;
     }
 
     return (

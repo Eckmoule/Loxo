@@ -1,11 +1,12 @@
 import { Helmet } from 'react-helmet-async'
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { supabase } from '../../lib/supabase';
 import { SEO_CONFIG } from '../../config/seo'
 import { getAggregatsCommune, formatCommuneData } from '../../services/aggregatsService';
 import { getCommuneByCode } from '../../services/communeService';
 import Icon from '../common/Icon';
+import LoadingSpinner from '../common/LoadingSpinner';
+import ErrorState from '../common/ErrorState';
 import './Commune.css';
 import './CommuneHeader.css';
 import './Chart.css';
@@ -702,39 +703,23 @@ function Commune() {
 
     // États de chargement/erreur
     if (loading) {
-        return (
-            <main className="commune-page">
-                <div className="commune-error">
-                    <h2>Chargement des données...</h2>
-                </div>
-            </main>
-        );
+        return <LoadingSpinner message="Chargement des données..." />;
     }
 
+    // Commune introuvable
     if (!commune) {
-        return (
-            <main className="commune-page">
-                <div className="commune-error">
-                    <h2>Commune introuvable</h2>
-                    <button onClick={() => navigate('/')} className="commune-back-btn">
-                        Retour à l'accueil
-                    </button>
-                </div>
-            </main>
-        );
+        return <ErrorState
+            title="Commune introuvable"
+            message="Cette commune n'existe pas ou n'est pas encore disponible dans notre base de données."
+        />;
     }
 
+    // Pas de données
     if (!cityData || !cityData.graphique_prix) {
-        return (
-            <main className="commune-page">
-                <div className="commune-error">
-                    <h2>Aucune donnée disponible pour cette commune</h2>
-                    <button onClick={() => navigate('/')} className="commune-back-btn">
-                        Retour à l'accueil
-                    </button>
-                </div>
-            </main>
-        );
+        return <ErrorState
+            title="Aucune donnée disponible"
+            message="Nous n'avons pas encore de données pour cette commune. Revenez prochainement !"
+        />;
     }
 
     return (

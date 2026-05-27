@@ -10,6 +10,7 @@ import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
+import NotFound from './components/pages/NotFound';
 import './App.css';
 
 function App() {
@@ -74,7 +75,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
 
           {/* 404 - Redirect to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </BrowserRouter>
