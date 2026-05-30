@@ -163,6 +163,56 @@
     cursor: not-allowed;
 }
 
+/* Overlay pour fermer en cliquant ailleurs */
+.commune-header__login-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    background: transparent;
+}
+
+/* Popup centrée */
+.commune-header__login-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 24px;
+    width: 280px;
+    z-index: 100;
+    text-align: center;
+}
+
+.commune-header__login-popup p {
+    font-size: 14px;
+    color: var(--text-2);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    margin: 0 0 16px;
+}
+
+.commune-header__login-popup button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 16px;
+    font-size: 13px;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    cursor: pointer;
+    width: 100%;
+    transition: background 0.15s;
+}
+
+.commune-header__login-popup button:hover {
+    background: var(--accent-hover);
+}
+
 @media (max-width: 768px) {
     .commune-header__actions {
         width: 100%;

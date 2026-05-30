@@ -6,6 +6,7 @@ import Home from './components/Home';
 import Commune from './components/pages/Commune';
 import CommuneTransactions from './components/pages/CommuneTransactions';
 import Contact from './components/pages/Contact';
+import Profile from './components/pages/Profile';
 import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import ForgotPassword from './components/auth/ForgotPassword';
@@ -62,13 +63,14 @@ function App() {
           <Route path="/" element={<Home />} />
 
           {/* Communes */}
-          <Route path="/commune/:codeCommune" element={<Commune />} />
+          <Route path="/commune/:codeCommune" element={<Commune user={user} />} />
           <Route path="/commune/:codeCommune/transactions" element={<CommuneTransactions />} />
 
           {/* Pages statiques */}
           <Route path="/contact" element={<Contact user={user} />} />
 
           {/* Auth */}
+          <Route path="/profile" element={<Profile user={user} onSignOut={handleSignOut} />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

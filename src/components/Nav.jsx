@@ -112,9 +112,9 @@ function Nav({ theme, onToggleTheme, user, onSignOut }) {
 
           {/* Sign in / User */}
           {user ? (
-            <button onClick={onSignOut} className="nav__user-button">
+            <button onClick={() => navigate('/profile')} className="nav__user-button">
               <Icon name="user" size={14} />
-              Déconnexion
+              {user.email}
             </button>
           ) : (
             <button onClick={() => navigate('/signin')} className="nav__signin-button">

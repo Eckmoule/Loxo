@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { SEO_CONFIG } from '../../config/seo'
 import { getAggregatsCommune, formatCommuneData } from '../../services/aggregatsService';
 import { getCommuneByCode } from '../../services/communeService';
+import { followCommune, unfollowCommune, getAlert } from '../../services/alertsService';
 import Icon from '../common/Icon';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorState from '../common/ErrorState';
@@ -36,9 +37,41 @@ const FIABILITE_CONFIG = {
 };
 
 // ── Composant Header ──
-function CommuneHeader({ commune, fiabilite, navigate, typeFilter }) {
-    const [alertSent, setAlertSent] = useState(false);
+function CommuneHeader({ commune, fiabilite, navigate, typeFilter, user }) {
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [loadingAlert, setLoadingAlert] = useState(false);
+    const [showLoginMessage, setShowLoginMessage] = useState(false);
     const f = FIABILITE_CONFIG[fiabilite.niveau];
+
+    // Vérifier si l'user suit déjà cette commune
+    useEffect(() => {
+        async function checkAlert() {
+            if (!user) return;
+            const alert = await getAlert(commune.code_commune);
+            setIsFollowing(alert?.is_active === true);
+        }
+        checkAlert();
+    }, [user, commune.code_commune]);
+
+    const handleFollow = async () => {
+        // Redirect si non connecté
+        if (!user) {
+            setShowLoginMessage(true);
+            return;
+        }
+        setShowLoginMessage(false);
+        setLoadingAlert(true);
+
+        if (isFollowing) {
+            await unfollowCommune(commune.code_commune);
+            setIsFollowing(false);
+        } else {
+            await followCommune(commune.code_commune);
+            setIsFollowing(true);
+        }
+
+        setLoadingAlert(false);
+    };
 
     return (
         <div className="commune-header">
@@ -113,23 +146,50 @@ function CommuneHeader({ commune, fiabilite, navigate, typeFilter }) {
                         </button>
                     )}
 
-                    {/* Alerte */}
-                    <button
-                        onClick={() => setAlertSent(a => !a)}
-                        className={`commune-header__btn ${alertSent ? 'commune-header__btn--active' : 'commune-header__btn--primary'}`}
-                    >
-                        {alertSent ? (
+                    <div style={{ position: 'relative' }}>
+                        {/* Bouton Suivre */}
+                        <button
+                            onClick={handleFollow}
+                            disabled={loadingAlert}
+                            className={`commune-header__btn ${isFollowing ? 'commune-header__btn--active' : 'commune-header__btn--primary'}`}
+                        >
+                            {loadingAlert ? (
+                                <>
+                                    <Icon name="bell" size={13} color={isFollowing ? 'var(--positive)' : 'white'} />
+                                    ...
+                                </>
+                            ) : isFollowing ? (
+                                <>
+                                    <Icon name="check" size={13} />
+                                    Suivi
+                                </>
+                            ) : (
+                                <>
+                                    <Icon name="bell" size={13} color="white" />
+                                    Suivre
+                                </>
+                            )}
+                        </button>
+
+                        {/* Overlay + Popup */}
+                        {showLoginMessage && (
                             <>
-                                <Icon name="check" size={13} />
-                                Alerte activée
-                            </>
-                        ) : (
-                            <>
-                                <Icon name="bell" size={13} color="white" />
-                                Suivre
+                                {/* Overlay : clic ferme la popup */}
+                                <div
+                                    className="commune-header__login-overlay"
+                                    onClick={() => setShowLoginMessage(false)}
+                                />
+
+                                {/* Popup centrée */}
+                                <div className="commune-header__login-popup">
+                                    <p>Connectez-vous pour suivre cette commune et être alerté des nouvelles données.</p>
+                                    <button onClick={() => navigate('/signin')}>
+                                        Se connecter
+                                    </button>
+                                </div>
                             </>
                         )}
-                    </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -655,7 +715,7 @@ function EvolAnnuelle({ data }) {
 }
 
 // ── Composant principal ──
-function Commune() {
+function Commune({ user }) {
     const { codeCommune } = useParams();
     const navigate = useNavigate();
 
@@ -750,6 +810,7 @@ function Commune() {
                         fiabilite={cityData.fiabilite}
                         navigate={navigate}
                         typeFilter={typeFilter}
+                        user={user}
                     />
 
                     {/* Graphique principal */}
