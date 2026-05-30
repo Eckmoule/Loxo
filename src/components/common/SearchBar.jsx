@@ -90,7 +90,11 @@ function SearchBar({ onSelect }) {
         <form onSubmit={handleSubmit} className="search-form">
             <div className={`search-input-wrapper ${showDropdown ? 'search-input-wrapper--focused' : ''}`}>
                 <div className="search-input-wrapper__icon">
-                    <Icon name="search" size={16} />
+                    {loading ? (
+                        <div className="search-spinner" />
+                    ) : (
+                        <Icon name="search" size={16} />
+                    )}
                 </div>
 
                 <input

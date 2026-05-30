@@ -222,3 +222,61 @@
         justify-content: flex-end;
     }
 }
+
+/* Popup arrondissements */
+.commune-header__arrondissements-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    padding: 24px;
+    width: 320px;
+    max-width: calc(100vw - 32px);
+    z-index: 100;
+}
+
+.commune-header__arrondissements-title {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-1);
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+    text-align: center;
+}
+
+.commune-header__arrondissements-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.commune-header__arrondissement-btn {
+    padding: 8px 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-1);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+}
+
+.commune-header__arrondissement-btn:hover {
+    background: var(--accent-subtle);
+    border-color: var(--accent);
+    color: var(--accent-text);
+}
+
+@media (max-width: 768px) {
+    .commune-header__arrondissements-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

@@ -8,6 +8,7 @@ import { followCommune, unfollowCommune, getAlert } from '../../services/alertsS
 import Icon from '../common/Icon';
 import LoadingSpinner from '../common/LoadingSpinner';
 import ErrorState from '../common/ErrorState';
+import { VILLES_ARRONDISSEMENTS } from '../../config/arrondissements';
 import './Commune.css';
 import './CommuneHeader.css';
 import './Chart.css';
@@ -41,6 +42,7 @@ function CommuneHeader({ commune, fiabilite, navigate, typeFilter, user }) {
     const [isFollowing, setIsFollowing] = useState(false);
     const [loadingAlert, setLoadingAlert] = useState(false);
     const [showLoginMessage, setShowLoginMessage] = useState(false);
+    const [showArrondissements, setShowArrondissements] = useState(false);
     const f = FIABILITE_CONFIG[fiabilite.niveau];
 
     // Vérifier si l'user suit déjà cette commune
@@ -123,19 +125,47 @@ function CommuneHeader({ commune, fiabilite, navigate, typeFilter, user }) {
                 {/* Right — CTAs */}
                 <div className="commune-header__actions">
                     {/* Voir transactions */}
-                    {['69123', '75056', '13055'].includes(commune.code_commune) ? (
-                        <div className="commune-header__btn-tooltip">
+                    {VILLES_ARRONDISSEMENTS[commune.code_commune] ? (
+                        <>
+                            {/* Overlay */}
+                            {showArrondissements && (
+                                <div
+                                    className="commune-header__login-overlay"
+                                    onClick={() => setShowArrondissements(false)}
+                                />
+                            )}
+
                             <button
-                                disabled
-                                className="commune-header__btn commune-header__btn--secondary commune-header__btn--disabled"
+                                onClick={() => setShowArrondissements(true)}
+                                className="commune-header__btn commune-header__btn--secondary"
                             >
                                 <Icon name="document" size={14} />
                                 Voir les transactions
                             </button>
-                            <span className="commune-header__btn-tooltip-text">
-                                Veuillez naviguer par arrondissement pour le détail
-                            </span>
-                        </div>
+
+                            {/* Popup arrondissements */}
+                            {showArrondissements && (
+                                <div className="commune-header__arrondissements-popup">
+                                    <h3 className="commune-header__arrondissements-title">
+                                        Choisir un arrondissement
+                                    </h3>
+                                    <div className="commune-header__arrondissements-grid">
+                                        {VILLES_ARRONDISSEMENTS[commune.code_commune].arrondissements.map(arr => (
+                                            <button
+                                                key={arr.code}
+                                                onClick={() => {
+                                                    setShowArrondissements(false);
+                                                    navigate(`/commune/${arr.code}/transactions`);
+                                                }}
+                                                className="commune-header__arrondissement-btn"
+                                            >
+                                                {arr.nom}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     ) : (
                         <button
                             onClick={() => navigate(`/commune/${commune.code_commune}/transactions`, { state: { typeFilter } })}
