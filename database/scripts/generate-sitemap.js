@@ -13,7 +13,7 @@ import { fileURLToPath } from 'url';
 dotenv.config({ path: '.env.local' });
 
 // ── Configuration ──
-const SITE_URL = 'https://loxo.fr';
+const SITE_URL = 'https://loxodata.app';
 const OUTPUT_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'public');
 const LAST_MOD = new Date().toISOString().split('T')[0]; // Format YYYY-MM-DD
 
