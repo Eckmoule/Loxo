@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { supabase } from './lib/supabase';
+import { Component } from 'react';
 import Nav from './components/Nav';
 import Home from './components/Home';
 import Commune from './components/pages/Commune';
@@ -14,6 +15,76 @@ import ResetPassword from './components/auth/ResetPassword';
 import Legal from './components/pages/Legal';
 import NotFound from './components/pages/NotFound';
 import './App.css';
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, info) {
+    console.error('🔴 React Error:', {
+      error: error.message,
+      stack: error.stack,
+      componentStack: info.componentStack
+    });
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'var(--bg)',
+          flexDirection: 'column',
+          gap: 16,
+          padding: 24
+        }}>
+          <h2 style={{
+            fontFamily: 'var(--font-display)',
+            color: 'var(--text-1)',
+            fontSize: 22,
+            fontWeight: 700
+          }}>
+            Une erreur inattendue s'est produite
+          </h2>
+          <p style={{
+            fontFamily: 'var(--font-sans)',
+            color: 'var(--text-3)',
+            fontSize: 14
+          }}>
+            Notre équipe a été notifiée. Veuillez recharger la page.
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              background: 'var(--accent)',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 'var(--radius-sm)',
+              padding: '10px 20px',
+              fontFamily: 'var(--font-sans)',
+              fontSize: 13,
+              cursor: 'pointer'
+            }}
+          >
+            Recharger la page
+          </button>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 
 function App() {
   const [theme, setTheme] = useState('dark');
@@ -51,37 +122,38 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-1)' }}>
-        <Nav
-          theme={theme}
-          onToggleTheme={handleToggleTheme}
-          user={user}
-          onSignOut={handleSignOut}
-        />
+      <ErrorBoundary>
+        <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--text-1)' }}>
+          <Nav
+            theme={theme}
+            onToggleTheme={handleToggleTheme}
+            user={user}
+          />
 
-        <Routes>
-          {/* Home */}
-          <Route path="/" element={<Home />} />
+          <Routes>
+            {/* Home */}
+            <Route path="/" element={<Home />} />
 
-          {/* Communes */}
-          <Route path="/commune/:codeCommune" element={<Commune user={user} />} />
-          <Route path="/commune/:codeCommune/transactions" element={<CommuneTransactions />} />
+            {/* Communes */}
+            <Route path="/commune/:codeCommune" element={<Commune user={user} />} />
+            <Route path="/commune/:codeCommune/transactions" element={<CommuneTransactions />} />
 
-          {/* Pages statiques */}
-          <Route path="/contact" element={<Contact user={user} />} />
-          <Route path="/legal" element={<Legal />} />
+            {/* Pages statiques */}
+            <Route path="/contact" element={<Contact user={user} />} />
+            <Route path="/legal" element={<Legal />} />
 
-          {/* Auth */}
-          <Route path="/profile" element={<Profile user={user} onSignOut={handleSignOut} />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+            {/* Auth */}
+            <Route path="/profile" element={<Profile user={user} onSignOut={handleSignOut} />} />
+            <Route path="/signin" element={<SignIn />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* 404 - Redirect to home */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </div>
+            {/* 404 - Redirect to home */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </div>
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }

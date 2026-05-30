@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Icon from './common/Icon';
 import './Nav.css';
 
-function Nav({ theme, onToggleTheme, user, onSignOut }) {
+function Nav({ theme, onToggleTheme, user }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const navigate = useNavigate();

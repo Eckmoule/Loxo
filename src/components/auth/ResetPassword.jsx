@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import { validateForm } from '../../utils/validation';
@@ -14,21 +14,21 @@ function ResetPassword() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [validToken, setValidToken] = useState(false);
 
-  useEffect(() => {
+  const getTokenFromUrl = () => {
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     const accessToken = hashParams.get('access_token');
     const type = hashParams.get('type');
+    return type === 'recovery' && accessToken;
+  };
 
-    if (type === 'recovery' && accessToken) {
-      setValidToken(true);
-    } else {
-      setError('Lien de réinitialisation invalide ou expiré.');
-    }
-  }, []);
+  const [validToken] = useState(getTokenFromUrl);
+  const [error, setError] = useState(
+    getTokenFromUrl() ? '' : 'Lien de réinitialisation invalide ou expiré.'
+  );
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();

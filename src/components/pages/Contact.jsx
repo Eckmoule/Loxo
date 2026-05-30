@@ -166,6 +166,7 @@ function Contact({ user }) {
                 </div>
               </FormField>
 
+
               {/* Message */}
               <FormField label="Message" error={errors.message}>
                 <textarea
@@ -196,7 +197,23 @@ function Contact({ user }) {
               </Button>
             </form>
           </div>
+          <p style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '12px',
+            color: 'var(--text-3)',
+            textAlign: 'center',
+            marginTop: '16px'
+          }}>
+            Vous pouvez aussi nous écrire directement à{' '}
+            <a
+              href="mailto:loxo.immo@gmail.com"
+              style={{ color: 'var(--accent)' }}
+            >
+              loxo.immo@gmail.com
+            </a>
+          </p>
         </div>
+
       </main>
     </>
   );

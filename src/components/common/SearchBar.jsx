@@ -20,23 +20,20 @@ function SearchBar({ onSelect }) {
             if (debouncedQuery.length < 2) {
                 setResults([]);
                 setShowDropdown(false);
+                setSelectedIndex(-1);  // ← déplacé ici
                 return;
             }
 
             setLoading(true);
             const communes = await searchCommunes(debouncedQuery);
             setResults(communes);
+            setSelectedIndex(-1);  // ← déplacé ici
             setShowDropdown(true);
             setLoading(false);
         }
 
         fetchResults();
     }, [debouncedQuery]);
-
-
-    useEffect(() => {
-        setSelectedIndex(-1);
-    }, [results]);
 
     const handleSelect = (commune) => {
         if (onSelect) {

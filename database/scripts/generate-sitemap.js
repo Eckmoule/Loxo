@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 // Scripts pour générer l'ensemble des sitemap pour toute les communes pour le referencement.
 // Génere un sitemap par département (2A & 2B pour Corse & 97 pour l'ensemble des communes des DOM-TOM)
 // A lancer via node generate-sitemap.js

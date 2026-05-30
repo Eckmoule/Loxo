@@ -1,6 +1,7 @@
 import { Helmet } from 'react-helmet-async'
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { useId } from 'react';
 import { SEO_CONFIG } from '../../config/seo'
 import { getAggregatsCommune, formatCommuneData } from '../../services/aggregatsService';
 import { getCommuneByCode } from '../../services/communeService';
@@ -260,6 +261,8 @@ function barColor(nb) {
 // ── Composant ComboChart ──
 function ComboChart({ data }) {
     const [tooltip, setTooltip] = useState(null);
+    const id = useId();
+    const gradId = `grad_${id.replace(/:/g, '')}`;
 
     if (!data || data.length === 0) {
         return (
@@ -313,8 +316,6 @@ function ComboChart({ data }) {
     // Labels X (trimestres)
     const xLabels = data.map((d, i) => ({ x: xOf(i), label: d.trimestre, i }))
         .filter((_, i) => data.length <= 10 ? true : i % 2 === 0);
-
-    const gradId = `grad_${Math.random().toString(36).slice(2)}`;
 
     return (
         <div style={{ position: 'relative', width: '100%' }}>

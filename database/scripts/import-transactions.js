@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 // Script d'import DVF (Demandes de Valeurs Foncières)
 // Source: https://files.data.gouv.fr/geo-dvf/latest/csv/
 
@@ -15,7 +17,6 @@ const ANNEES = [2021, 2022, 2023, 2024, 2025];
 import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import { createGunzip } from 'zlib';
-import { pipeline } from 'stream/promises';
 import csv from 'csv-parser';
 import { Readable } from 'stream';
 

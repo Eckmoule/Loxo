@@ -1,3 +1,5 @@
+/* eslint-env node */
+
 // Scripts pour charger la table communes a partir de l'API : https://geo.api.gouv.fr/communes
 // A lancer via node import-communes.js
 
