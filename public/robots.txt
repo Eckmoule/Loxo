@@ -12,4 +12,4 @@ Disallow: /reset-password
 Disallow: /profile
 
 # Sitemap
-Sitemap: https://loxo.fr/sitemap.xml
+Sitemap: https://loxodata.app/sitemap.xml

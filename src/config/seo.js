@@ -10,7 +10,7 @@ export const SEO_CONFIG = {
 
     // Site
     SITE_NAME: 'Loxo',
-    SITE_URL: 'https://loxo.fr',
+    SITE_URL: 'https://loxodata.app',
 
     // Descriptions réutilisables
     DATA_SOURCE: 'Données notariales publiques (DVF)',
