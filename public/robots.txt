@@ -10,6 +10,7 @@ Disallow: /signup
 Disallow: /forgot-password
 Disallow: /reset-password
 Disallow: /profile
+Disallow: /legal
 
 # Sitemap
 Sitemap: https://loxodata.app/sitemap.xml
