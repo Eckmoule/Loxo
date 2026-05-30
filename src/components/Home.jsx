@@ -72,7 +72,21 @@ function Home() {
               ))}
             </div>
           </div>
+
         </section>
+        <footer className="hero__footer">
+          <button onClick={() => navigate('/legal')} className="hero__footer-link">
+            Mentions légales
+          </button>
+          <span className="hero__footer-sep">·</span>
+          <button onClick={() => navigate('/legal')} className="hero__footer-link">
+            Confidentialité
+          </button>
+          <span className="hero__footer-sep">·</span>
+          <span className="hero__footer-credit">
+            Données DVF © Ministère de l'Économie — Licence Ouverte Etalab 2.0
+          </span>
+        </footer>
       </main>
     </>
   );

@@ -126,3 +126,34 @@
     border: 1px solid var(--border-subtle);
     font-family: var(--font-mono);
 }
+
+.hero__footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 24px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-3);
+}
+
+.hero__footer-link {
+    background: none;
+    border: none;
+    color: var(--text-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+}
+
+.hero__footer-link:hover {
+    color: var(--text-2);
+}
+
+.hero__footer-sep {
+    color: var(--border);
+}

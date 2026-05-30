@@ -11,6 +11,7 @@ import SignIn from './components/auth/SignIn';
 import SignUp from './components/auth/SignUp';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
+import Legal from './components/pages/Legal';
 import NotFound from './components/pages/NotFound';
 import './App.css';
 
@@ -68,6 +69,7 @@ function App() {
 
           {/* Pages statiques */}
           <Route path="/contact" element={<Contact user={user} />} />
+          <Route path="/legal" element={<Legal />} />
 
           {/* Auth */}
           <Route path="/profile" element={<Profile user={user} onSignOut={handleSignOut} />} />

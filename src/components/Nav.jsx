@@ -62,6 +62,11 @@ function Nav({ theme, onToggleTheme, user, onSignOut }) {
         setMenuOpen(false);
       }
     },
+    {
+      label: 'Mentions légales',
+      icon: <Icon name="info" size={14} />,
+      action: () => { navigate('/legal'); setMenuOpen(false); }
+    },
   ];
 
   return (
