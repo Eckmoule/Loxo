@@ -128,3 +128,41 @@
         display: none;
     }
 }
+
+/* Bloc SEO discret */
+.commune-seo-text {
+    margin-top: 32px;
+    padding: 20px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--border-subtle);
+}
+
+.commune-seo-text h2 {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-2);
+    margin: 0 0 10px;
+    letter-spacing: 0;
+}
+
+.commune-seo-text p {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text-3);
+    line-height: 1.7;
+    margin: 0 0 8px;
+}
+
+.commune-seo-text p:last-child {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+}
+
+.commune-seo-text strong {
+    color: var(--text-2);
+    font-weight: 600;
+}

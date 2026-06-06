@@ -872,6 +872,30 @@ function Commune({ user }) {
                     {/* Évolution annuelle */}
                     <EvolAnnuelle data={cityData.evolution_annuelle} />
 
+                    {/* Bloc SEO discret */}
+                    <div className="commune-seo-text">
+                        <h2>Prix immobilier à {commune.nom_commune} ({commune.code_postal?.[0]})</h2>
+                        <p>
+                            À {commune.nom_commune}, le prix médian au m² est de{' '}
+                            <strong>{cityData.stats_12_mois.prix_m2.valeur.toLocaleString('fr-FR')} €/m²</strong>{' '}
+                            sur les 12 derniers mois, basé sur{' '}
+                            <strong>{cityData.stats_12_mois.transactions.total.toLocaleString('fr-FR')} transactions</strong>{' '}
+                            officielles. Le prix d'achat moyen est de{' '}
+                            <strong>{cityData.stats_12_mois.achat_moyen.valeur.toLocaleString('fr-FR')} €</strong>.
+                        </p>
+                        <p>
+                            Le marché immobilier de {commune.nom_commune} se compose de{' '}
+                            <strong>{cityData.stats_12_mois.repartition.appartements_pct}% d'appartements</strong>{' '}
+                            et de{' '}
+                            <strong>{cityData.stats_12_mois.repartition.maisons_pct}% de maisons</strong>.
+                        </p>
+                        <p>
+                            Données issues de la base officielle DVF (Demandes de Valeurs Foncières)
+                            publiée par le Ministère de l'Économie — Licence Ouverte Etalab 2.0.
+                            Période couverte : 2021-2025.
+                        </p>
+                    </div>
+
                     <button onClick={() => navigate('/')} className="commune-back-btn commune-back-btn--bottom">
                         ← Retour à l'accueil
                     </button>
